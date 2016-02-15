@@ -1,36 +1,44 @@
-#include <boost/bind.hpp>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/common/common.hh>
-#include <stdio.h>
+#include "maze_plugin.h"
 
-namespace gazebo
-{
-  class MazePlugin : public ModelPlugin
-  {
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
-    {
-      // Store the pointer to the model
-      this->model = _parent;
+GZ_REGISTER_MODEL_PLUGIN(MazePlugin)
 
-      // Listen to the update event. This event is broadcast every
-      // simulation iteration.
-      this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MazePlugin::OnUpdate, this, _1));
-    }
+void MazePlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf){
+  this->model = _parent;
 
-    // Called by the world update start event
-    public: void OnUpdate(const common::UpdateInfo & /*_info*/)
-    {
-    }
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&MazePlugin::OnUpdate, this, _1));
 
-    // Pointer to the model
-    private: physics::ModelPtr model;
+  std::string maze_file;
+	if (_sdf->HasElement("maze_file")) {
+		maze_file = _sdf->Get<std::string>("maze_file");
+	}
 
-    // Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
-  };
+  gzmsg << "loading plugin" << "file=" << maze_file << std::endl;
 
-  // Register this plugin with the simulator
-  GZ_REGISTER_MODEL_PLUGIN(MazePlugin)
+  physics::JointPtr joint = _parent->GetWorld()->GetPhysicsEngine()->CreateJoint("fixed", _parent);
+  gzmsg << "joint name=" << joint->GetName() << std::endl;
+
+  sdf::SDFPtr modelSDF(new sdf::SDF);
+  sdf::initFile("root.sdf", modelSDF);
+
+
+	const std::string filename = "/home/peter/Projects/gzmaze/wall_model/model.sdf";
+	if (!sdf::readFile(filename, modelSDF)) {
+		gzerr << "Unable to load file[" << filename << "]\n";
+		return;
+	}
+	if (modelSDF->Root()->HasElement("model")) {
+    sdf::ElementPtr wall_element = modelSDF->Root()->GetElement("model");
+		gzmsg << "adding entity" << wall_element->GetName() << std::endl;
+    //joint->Attach(_parent->GetLink("base"), wall_element);
+	}
+	else {
+		gzerr << "No model in SDF\n";
+		return;
+	}
+
+}
+
+
+void MazePlugin::OnUpdate(const common::UpdateInfo & _info) {
 }
