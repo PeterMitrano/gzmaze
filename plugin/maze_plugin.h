@@ -9,6 +9,7 @@ class MazePlugin : public ModelPlugin {
   public:
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
     void OnUpdate(const common::UpdateInfo &_info);
+    void GenerateSDF();
   private:
     physics::ModelPtr model;
     event::ConnectionPtr updateConnection;
