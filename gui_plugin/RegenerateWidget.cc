@@ -22,8 +22,11 @@ RegenerateWidget::RegenerateWidget()
   QFrame *mainFrame = new QFrame();
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
-  QPushButton *button = new QPushButton(tr("Regenerate Maze"));
+  QPushButton *button = new QPushButton(tr("Regenerate From File"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
+
+  QPushButton *randomButton = new QPushButton(tr("Regenerate Randomly"));
+  connect(randomButton, SIGNAL(clicked()), this, SLOT(OnRandomButton()));
 
   textEdit = new QTextEdit(tr("~/Projects/gzmaze/maze.mz"));
   textEdit->setContentsMargins(1, 1, 1, 1);
@@ -33,6 +36,7 @@ RegenerateWidget::RegenerateWidget()
 
   frameLayout->addWidget(button);
   frameLayout->addWidget(textEdit);
+  frameLayout->addWidget(randomButton);
   mainFrame->setLayout(frameLayout);
   mainLayout->addWidget(mainFrame);
 
@@ -52,6 +56,14 @@ RegenerateWidget::RegenerateWidget()
 /////////////////////////////////////////////////
 RegenerateWidget::~RegenerateWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void RegenerateWidget::OnRandomButton()
+{
+  msgs::GzString msg;
+  msg.set_data("random");
+  this->regenPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

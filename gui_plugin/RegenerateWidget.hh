@@ -22,6 +22,9 @@ namespace gazebo
       public: virtual ~RegenerateWidget();
 
       /// \brief Callback trigged when the button is pressed.
+      protected slots: void OnRandomButton();
+
+      /// \brief Callback trigged when the button is pressed.
       protected slots: void OnButton();
 
       /// \brief Counter used to create unique model names
