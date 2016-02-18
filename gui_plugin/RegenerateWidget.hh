@@ -33,6 +33,7 @@ namespace gazebo
       /// \brief Publisher of factory messages.
       private: transport::PublisherPtr regenPub;
 
+      private: QTextEdit *textEdit;
       private: std::string maze_filename;
     };
 }

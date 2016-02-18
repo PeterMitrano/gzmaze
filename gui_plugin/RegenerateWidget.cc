@@ -25,7 +25,7 @@ RegenerateWidget::RegenerateWidget()
   QPushButton *button = new QPushButton(tr("Regenerate Maze"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
 
-  QTextEdit *textEdit = new QTextEdit(tr("~/Projects/gzmaze/maze.mz"));
+  textEdit = new QTextEdit(tr("~/Projects/gzmaze/maze.mz"));
   textEdit->setContentsMargins(1, 1, 1, 1);
   textEdit->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
   textEdit->setObjectName("maze_filename");
@@ -46,7 +46,7 @@ RegenerateWidget::RegenerateWidget()
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->regenPub = this->node->Advertise<msgs::Factory>("~/maze/regenerate");
+  this->regenPub = this->node->Advertise<msgs::GzString>("~/maze/regenerate");
 }
 
 /////////////////////////////////////////////////
@@ -58,6 +58,8 @@ RegenerateWidget::~RegenerateWidget()
 void RegenerateWidget::OnButton()
 {
   msgs::GzString msg;
+  maze_filename = textEdit->toPlainText().toStdString();
   msg.set_data(maze_filename);
+  gzmsg << "loading from file " << maze_filename << std::endl;
   this->regenPub->Publish(msg);
 }
