@@ -555,8 +555,5 @@
     </joint>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-    <plugin name="maze_plugin" filename="libmaze_plugin.so">
-      <maze_file>/home/peter/Projects/2016_Solvers/mazes/16x16.mz</maze_file>
-    </plugin>
   </model>
 </sdf>

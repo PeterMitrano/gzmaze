@@ -1,16 +1,21 @@
-#include <boost/bind.hpp>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/common/common.hh>
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/common.hh"
+#include "gazebo/gazebo.hh"
 
-using namespace gazebo;
 
-class MazePlugin : public ModelPlugin {
-  public:
-    void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-    void OnUpdate(const common::UpdateInfo &_info);
-    void GenerateSDF();
-  private:
-    physics::ModelPtr model;
-    event::ConnectionPtr updateConnection;
-};
+namespace gazebo {
+  class MazePlugin: public WorldPlugin {
+
+    public:
+      MazePlugin();
+
+      void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
+
+
+    private:
+      sdf::ElementPtr model;
+
+			transport::PublisherPtr factoryPub;
+
+  };
+}
