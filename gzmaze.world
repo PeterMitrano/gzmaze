@@ -9,6 +9,10 @@
       <uri>model://sun</uri>
     </include>
 
+    <gui>
+      <plugin name="sample" filename="libregenerate_widget.so"/>
+    </gui>
+
     <plugin name="maze" filename="libmaze_plugin.so"/>
   </world>
 </sdf>

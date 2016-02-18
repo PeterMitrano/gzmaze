@@ -11,11 +11,14 @@ namespace gazebo {
 
       void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
 
+			void Regenerate(ConstGzStringPtr &msg);
 
     private:
-      sdf::ElementPtr model;
+			transport::NodePtr node;
+			sdf::SDFPtr modelSDF;
 
-			transport::PublisherPtr factoryPub;
+			transport::SubscriberPtr sub;
+      physics::WorldPtr _parent;
 
   };
 }

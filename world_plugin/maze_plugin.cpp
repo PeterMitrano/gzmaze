@@ -4,10 +4,17 @@
 
 namespace gazebo {
 
-	MazePlugin::MazePlugin() {}
+	MazePlugin::MazePlugin(): modelSDF() {}
 
 	void MazePlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf) {
-		sdf::SDFPtr modelSDF;
+    this->_parent = _parent;
+		node = transport::NodePtr(new transport::Node());
+		node->Init(_parent->GetName());
+		sub = node->Subscribe("~/maze/generate", &MazePlugin::Regenerate, this);
+
+	}
+
+	void MazePlugin::Regenerate(ConstGzStringPtr &msg){
 
 		modelSDF.reset(new sdf::SDF);
 
