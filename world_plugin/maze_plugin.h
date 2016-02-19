@@ -20,6 +20,10 @@ namespace gazebo {
 
       void AddWalls(sdf::ElementPtr model);
 
+      msgs::BoxGeom *box;
+      msgs::Geometry *geo;
+      msgs::Visual *visual;
+
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;
 
