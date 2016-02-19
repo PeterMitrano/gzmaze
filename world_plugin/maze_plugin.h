@@ -1,5 +1,4 @@
 #include "gazebo/physics/physics.hh"
-#include "LinkData.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
 
@@ -14,18 +13,16 @@ namespace gazebo {
 
 			void Regenerate(ConstGzStringPtr &msg);
 
-			sdf::ElementPtr GenerateLinkSDF(gui::LinkData *_link);
-
 		private:
 
-      /// \brief A map of model link names to their data.
-      std::map<std::string, LinkData *> allLinks;
+      // \brief load from maze_base/model.sdf
+      sdf::ElementPtr LoadModel();
 
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;
 
 			transport::SubscriberPtr sub;
-			physics::WorldPtr _parent;
+			physics::WorldPtr parent;
 
 	};
 }
