@@ -18,6 +18,8 @@ namespace gazebo {
       // \brief load from maze_base/model.sdf
       sdf::ElementPtr LoadModel();
 
+      void AddWalls(sdf::ElementPtr model);
+
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;
 

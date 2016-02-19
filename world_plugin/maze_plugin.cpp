@@ -18,10 +18,7 @@ namespace gazebo {
 
     sdf::ElementPtr model = LoadModel();
 
-    msgs::Link link;
-    link.set_name("walls");
-    sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
-    model->InsertElement(newLinkElem);
+    AddWalls(model);
 
     if (maze_filename == "random") {
       //create random maze here
@@ -34,6 +31,32 @@ namespace gazebo {
     model->GetElement("pose")->Set(
         math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
     parent->InsertModelSDF(*modelSDF);
+  }
+
+  void MazePlugin::AddWalls(sdf::ElementPtr model){
+    msgs::Link link;
+    link.set_name("walls");
+
+    msgs::Vector3d size;
+    size.set_x(0.05);
+    size.set_y(0.1);
+    size.set_z(0.2);
+
+    msgs::BoxGeom box;
+    box.set_allocated_size(&size);
+
+    msgs::Geometry geometry;
+    geometry.set_type(msgs::Geometry_Type::Geometry_Type_BOX);
+    geometry.set_allocated_box(&box);
+
+    msgs::Visual *visual = link.add_visual();
+    visual->set_name("v1");
+    visual->set_parent_name("walls");
+    visual->set_type(msgs::Visual_Type::Visual_Type_LINK);
+    visual->set_allocated_geometry(&geometry);
+
+    sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
+    model->InsertElement(newLinkElem);
   }
 
   sdf::ElementPtr MazePlugin::LoadModel() {
