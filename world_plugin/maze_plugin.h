@@ -18,13 +18,21 @@ namespace gazebo {
       // \brief load from maze_base/model.sdf
       sdf::ElementPtr LoadModel();
 
-      void AddWalls(sdf::ElementPtr model);
+      sdf::ElementPtr CreateWalls();
+      sdf::ElementPtr CreateJoint();
+
+			msgs::Geometry *CreateWallGeometry();
 
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;
 
 			transport::SubscriberPtr sub;
 			physics::WorldPtr parent;
+
+      const static float WALL_LENGTH,
+            WALL_HEIGHT,
+            WALL_THICKNESS,
+            BASE_HEIGHT;
 
 	};
 }
