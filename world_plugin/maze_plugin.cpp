@@ -42,18 +42,16 @@ namespace gazebo {
 		size->set_y(0.05);
 		size->set_z(0.16);
 
-		box = new msgs::BoxGeom();
+		msgs::BoxGeom *box = new msgs::BoxGeom();
 		box->set_allocated_size(size);
 
-		geo = new msgs::Geometry();
+		msgs::Geometry *geo = new msgs::Geometry();
 		geo->set_type(msgs::Geometry_Type_BOX);
 		geo->set_allocated_box(box);
 
-    visual = link.add_visual();
+    msgs::Visual *visual = link.add_visual();
     visual->set_name("v1");
-		visual->set_parent_name("walls");
     visual->set_allocated_geometry(geo);
-
 
     sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
     model->InsertElement(newLinkElem);
