@@ -1,9 +1,25 @@
-#include <utility>
+#include <tuple>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
 
 namespace gazebo {
+
+  enum class Direction {
+    N,
+    E,
+    S,
+    W,
+    Last,
+    First = N,
+    INVALID = -1
+  };
+
+  /**
+   * \brief increments the direction in the order N, E, S, W, N, ...
+   */
+  Direction operator++(Direction& dir, int);
+
 	class MazeFactory: public WorldPlugin {
 
 		public:
@@ -14,16 +30,6 @@ namespace gazebo {
 			void Regenerate(ConstGzStringPtr &msg);
 
 		private:
-
-			enum class Direction {
-				N,
-				E,
-				S,
-				W,
-				Last,
-				First = N,
-				INVALID = -1
-			};
 
       char to_char(Direction dir);
 
@@ -48,11 +54,8 @@ namespace gazebo {
         int col,
         Direction dir);
 
-      std::pair<float, float> ToLocation(int row, int col, Direction dir);
-
 			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
-			msgs::Pose *CreatePose(float px, float py, float pz,
-          float ox, float oy, float oz, float ow);
+			msgs::Pose *CreatePose(int row, int col, float z, Direction dir);
 
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;

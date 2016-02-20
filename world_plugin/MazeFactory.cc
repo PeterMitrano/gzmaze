@@ -1,6 +1,7 @@
 #include "MazeFactory.hh"
 
 #include <ignition/math/Pose3.hh>
+#include <cmath>
 
 namespace gazebo
 {
@@ -50,15 +51,26 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
 
 void MazeFactory::InsertWalls(sdf::ElementPtr base_link)
 {
-  for (int i=0;i<=MAZE_SIZE;i++){
-    InsertWall(base_link, i, i, Direction::S);
+  for (int row=0;row<MAZE_SIZE;row++){
+    for (int col=0;col<MAZE_SIZE;col++){
+      InsertWall(base_link, row, col, Direction::N);
+      InsertWall(base_link, row, col, Direction::W);
+    }
+  }
+
+  for (int col=0;col<MAZE_SIZE;col++){
+    InsertWall(base_link, MAZE_SIZE-1, col, Direction::S);
+  }
+
+  for (int row=0;row<MAZE_SIZE;row++){
+    InsertWall(base_link, row, MAZE_SIZE-1, Direction::E);
   }
 }
 
 void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
 {
-  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,Direction::S);
-  sdf::ElementPtr walls_collision = CreateWallCollision(row,col,Direction::S);
+  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,dir);
+  sdf::ElementPtr walls_collision = CreateWallCollision(row,col,dir);
 
   //insert all the visuals
   std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
@@ -72,12 +84,8 @@ void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction d
 
 std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direction dir)
 {
-  std::pair<float, float> location = ToLocation(row, col, dir);
-
-  msgs::Pose *visual_pose = CreatePose(location.first, location.second, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2,
-                                       0, 0, 0, 0);
-  msgs::Pose *paint_visual_pose = CreatePose(location.first, location.second, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2,
-                                  0, 0, 0, 0);
+  msgs::Pose *visual_pose = CreatePose(row, col, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2, dir);
+  msgs::Pose *paint_visual_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2, dir);
 
   msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH,
                                WALL_THICKNESS,
@@ -120,8 +128,7 @@ std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direc
 
 sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir)
 {
-  std::pair<float, float> location = ToLocation(row, col, dir);
-  msgs::Pose *collision_pose = CreatePose(location.first, location.second, BASE_HEIGHT + WALL_HEIGHT/2, 0, 0, 0, 0);
+  msgs::Pose *collision_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT/2, dir);
 
   msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH,
                                   WALL_THICKNESS,
@@ -137,35 +144,45 @@ sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir
   return collisionElem;
 }
 
-std::pair<float, float> MazeFactory::ToLocation(int row, int col, Direction dir)
-{
-  std::pair<float, float> location; //x, y
+msgs::Pose *MazeFactory::CreatePose(int row, int col, float z, Direction dir) {
+  float x_offset=0, y_offset=0;
+  float z_rot = 0;
 
-  float zero_offset = -(UNIT * (MAZE_SIZE/2));
-  location.first = zero_offset + col * UNIT;
-  location.second = zero_offset + row * UNIT;
+  switch(dir){
+    case Direction::N:
+      y_offset = UNIT/2;
+      break;
+    case Direction::E:
+     x_offset = UNIT/2;
+      z_rot = M_PI/2;
+     break;
+    case Direction::S:
+     y_offset = -UNIT/2;
+     break;
+    case Direction::W:
+     x_offset = -UNIT/2;
+     z_rot = M_PI/2;
+     break;
+  }
 
-  return location;
-}
+  float zero_offset = (UNIT * (MAZE_SIZE - 1)/2);
+  float x = -zero_offset + x_offset + col * UNIT;
+  float y = zero_offset + y_offset - row * UNIT;
 
-msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,
-                                    float ox, float oy, float oz, float ow)
-{
   msgs::Vector3d *position = new msgs::Vector3d();
-  position->set_x(px);
-  position->set_y(py);
-  position->set_z(pz);
+  position->set_x(x);
+  position->set_y(y);
+  position->set_z(z);
 
   msgs::Quaternion *orientation = new msgs::Quaternion();
-  orientation->set_x(ox);
-  orientation->set_y(oy);
-  orientation->set_z(oz);
-  orientation->set_w(ow);
+  orientation->set_x(0);
+  orientation->set_y(0);
+  orientation->set_z(sin(z_rot/2));
+  orientation->set_w(cos(z_rot/2));
 
   msgs::Pose *pose = new msgs::Pose;
   pose->set_allocated_orientation(orientation);
   pose->set_allocated_position(position);
-
 }
 
 msgs::Geometry *MazeFactory::CreateBoxGeometry(float x, float y, float z)
@@ -193,6 +210,26 @@ sdf::ElementPtr MazeFactory::LoadModel()
   sdf::readFile("maze_base/model.sdf", modelSDF);
 
   return modelSDF->Root()->GetElement("model");
+}
+
+Direction operator++(Direction& dir, int) {
+  switch(dir){
+    case Direction::N:
+      dir = Direction::E;
+      break;
+    case Direction::E:
+      dir = Direction::S;
+      break;
+    case Direction::S:
+      dir = Direction::W;
+      break;
+    case Direction::W:
+      dir = Direction::Last;
+      break;
+    default:
+      dir = Direction::INVALID;
+  }
+  return dir;
 }
 
 char MazeFactory::to_char(Direction dir)
