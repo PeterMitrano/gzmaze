@@ -5,6 +5,8 @@
 namespace gazebo
 {
 
+const int MazeFactory::MAZE_SIZE = 16;
+const float MazeFactory::UNIT = 0.18; //distance between centers of squares
 const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.16;
 const float MazeFactory::WALL_THICKNESS = 0.012;
@@ -28,7 +30,7 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
 
   sdf::ElementPtr model = LoadModel();
 
-  sdf::ElementPtr walls_link = CreateWalls();
+  sdf::ElementPtr walls_link = CreateWall(0,0,Direction::S);
   sdf::ElementPtr walls_joint = CreateJoint();
 
   model->InsertElement(walls_link);
@@ -61,18 +63,22 @@ sdf::ElementPtr MazeFactory::CreateJoint()
   return newJointElem;
 }
 
-sdf::ElementPtr MazeFactory::CreateWalls()
+sdf::ElementPtr MazeFactory::CreateWall(float row, float col, Direction dir)
 {
   msgs::Link link;
   link.set_name("walls");
   link.set_self_collide(true);
 
-  msgs::Pose *link_pose = CreatePose(0, 0, 0.1, 0, 0, 0, 0);
+  float zero_offset = -UNIT * (MAZE_SIZE/2 - 1);
+  float link_x = zero_offset + col * UNIT;
+  float link_y = zero_offset + row * UNIT;
+
+  msgs::Pose *link_pose = CreatePose(link_x, link_y, 0.1, 0, 0, 0, 0);
   msgs::Pose *collision_pose = CreatePose(0, 0, WALL_HEIGHT/2, 0, 0, 0, 0);
   msgs::Pose *visual_pose = CreatePose(0, 0, WALL_HEIGHT/2 - PAINT_THICKNESS/2,
-      0, 0, 0, 0);
+                                       0, 0, 0, 0);
   msgs::Pose *paint_visual_pose = CreatePose(0, 0, WALL_HEIGHT - PAINT_THICKNESS/2,
-      0, 0, 0, 0);
+                                  0, 0, 0, 0);
 
   link.set_allocated_pose(link_pose);
 

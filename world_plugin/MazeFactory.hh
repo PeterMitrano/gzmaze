@@ -2,7 +2,6 @@
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
 
-
 namespace gazebo {
 	class MazeFactory: public WorldPlugin {
 
@@ -15,10 +14,23 @@ namespace gazebo {
 
 		private:
 
+			enum class Direction {
+				N,
+				E,
+				S,
+				W,
+				Last,
+				First = N,
+				INVALID = -1
+			};
+
       // \brief load from maze_base/model.sdf
       sdf::ElementPtr LoadModel();
 
       sdf::ElementPtr CreateWalls();
+      sdf::ElementPtr CreateWall(float row,
+        float col,
+        Direction dir);
       sdf::ElementPtr CreateJoint();
 
 			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
@@ -31,10 +43,12 @@ namespace gazebo {
 			transport::SubscriberPtr sub;
 			physics::WorldPtr parent;
 
+      const static int MAZE_SIZE;
       const static float WALL_LENGTH,
             WALL_HEIGHT,
             WALL_THICKNESS,
             PAINT_THICKNESS,
+            UNIT,
             BASE_HEIGHT;
 
 	};
