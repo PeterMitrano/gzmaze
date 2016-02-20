@@ -15,7 +15,7 @@ RegenerateWidget::RegenerateWidget()
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
-      "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+    "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
 
   // Create the main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;

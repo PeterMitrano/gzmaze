@@ -4,10 +4,10 @@
 
 
 namespace gazebo {
-	class MazePlugin: public WorldPlugin {
+	class MazeFactory: public WorldPlugin {
 
 		public:
-			MazePlugin();
+			MazeFactory();
 
 			void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
 
