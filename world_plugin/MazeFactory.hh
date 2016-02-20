@@ -21,7 +21,7 @@ namespace gazebo {
       sdf::ElementPtr CreateWalls();
       sdf::ElementPtr CreateJoint();
 
-			msgs::Geometry *CreateWallGeometry();
+			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
 			msgs::Pose *CreatePose(float px, float py, float pz,
           float ox, float oy, float oz, float ow);
 
@@ -34,6 +34,7 @@ namespace gazebo {
       const static float WALL_LENGTH,
             WALL_HEIGHT,
             WALL_THICKNESS,
+            PAINT_THICKNESS,
             BASE_HEIGHT;
 
 	};

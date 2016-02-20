@@ -9,6 +9,8 @@ const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.16;
 const float MazeFactory::WALL_THICKNESS = 0.012;
 const float MazeFactory::BASE_HEIGHT= 0.2;
+const float MazeFactory::PAINT_THICKNESS = 0.01;
+
 
 MazeFactory::MazeFactory(): modelSDF() {}
 
@@ -65,14 +67,26 @@ sdf::ElementPtr MazeFactory::CreateWalls()
   link.set_name("walls");
   link.set_self_collide(true);
 
-  msgs::Pose *link_pose = CreatePose(0,0,0.1,0,0,0,0);
-  msgs::Pose *collision_pose = CreatePose(0,0,WALL_HEIGHT/2,0,0,0,0);
-  msgs::Pose *visual_pose = CreatePose(0,0,WALL_HEIGHT/2,0,0,0,0);
+  msgs::Pose *link_pose = CreatePose(0, 0, 0.1, 0, 0, 0, 0);
+  msgs::Pose *collision_pose = CreatePose(0, 0, WALL_HEIGHT/2, 0, 0, 0, 0);
+  msgs::Pose *visual_pose = CreatePose(0, 0, WALL_HEIGHT/2 - PAINT_THICKNESS/2,
+      0, 0, 0, 0);
+  msgs::Pose *paint_visual_pose = CreatePose(0, 0, WALL_HEIGHT - PAINT_THICKNESS/2,
+      0, 0, 0, 0);
 
   link.set_allocated_pose(link_pose);
 
-  msgs::Geometry *visual_geo = CreateWallGeometry();
-  msgs::Geometry *collision_geo = CreateWallGeometry();
+  msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH,
+                               WALL_THICKNESS,
+                               WALL_HEIGHT - PAINT_THICKNESS);
+
+  msgs::Geometry *paint_visual_geo = CreateBoxGeometry(WALL_LENGTH,
+                                     WALL_THICKNESS,
+                                     PAINT_THICKNESS);
+
+  msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH,
+                                  WALL_THICKNESS,
+                                  WALL_HEIGHT);
 
   msgs::Collision *collision = link.add_collision();
   collision->set_name("c1");
@@ -84,12 +98,27 @@ sdf::ElementPtr MazeFactory::CreateWalls()
   visual->set_allocated_geometry(visual_geo);
   visual->set_allocated_pose(visual_pose);
 
+  msgs::Material_Script *paint_script = new msgs::Material_Script();
+  std::string *uri = paint_script->add_uri();
+  *uri = "file://media/materials/scripts/gazebo.material";
+  paint_script->set_name("Gazebo/Red");
+
+  msgs::Material *paint_material = new msgs::Material();
+  paint_material->set_allocated_script(paint_script);
+
+  msgs::Visual *paint_visual = link.add_visual();
+  paint_visual->set_name("v1_paint");
+  paint_visual->set_allocated_geometry(paint_visual_geo);
+  paint_visual->set_allocated_pose(paint_visual_pose);
+  paint_visual->set_allocated_material(paint_material);
+
   sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
   return newLinkElem;
 }
 
 msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,
-          float ox, float oy, float oz, float ow) {
+                                    float ox, float oy, float oz, float ow)
+{
   msgs::Vector3d *position = new msgs::Vector3d();
   position->set_x(px);
   position->set_y(py);
@@ -107,12 +136,12 @@ msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,
 
 }
 
-msgs::Geometry *MazeFactory::CreateWallGeometry()
+msgs::Geometry *MazeFactory::CreateBoxGeometry(float x, float y, float z)
 {
   msgs::Vector3d *size = new msgs::Vector3d();
-  size->set_x(WALL_LENGTH);
-  size->set_y(WALL_THICKNESS);
-  size->set_z(WALL_HEIGHT);
+  size->set_x(x);
+  size->set_y(y);
+  size->set_z(z);
 
   msgs::BoxGeom *box = new msgs::BoxGeom();
   box->set_allocated_size(size);
