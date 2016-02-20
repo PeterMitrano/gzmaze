@@ -10,7 +10,7 @@ const float MazeFactory::UNIT = 0.18; //distance between centers of squares
 const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.16;
 const float MazeFactory::WALL_THICKNESS = 0.012;
-const float MazeFactory::BASE_HEIGHT= 0.2;
+const float MazeFactory::BASE_HEIGHT= 0.1;
 const float MazeFactory::PAINT_THICKNESS = 0.01;
 
 
@@ -29,12 +29,9 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   std::string maze_filename = msg->data();
 
   sdf::ElementPtr model = LoadModel();
+  sdf::ElementPtr base_link = model->GetElement("link");
 
-  sdf::ElementPtr walls_link = CreateWall(0,0,Direction::S);
-  sdf::ElementPtr walls_joint = CreateJoint();
-
-  model->InsertElement(walls_link);
-  model->InsertElement(walls_joint);
+  InsertWall(base_link, 0, 0, Direction::S);
 
   if (maze_filename == "random")
   {
@@ -51,36 +48,16 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   parent->InsertModelSDF(*modelSDF);
 }
 
-sdf::ElementPtr MazeFactory::CreateJoint()
+std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(float row, float col, Direction dir)
 {
-  msgs::Joint joint;
-  joint.set_name("walls_joint");
-  joint.set_parent("base");
-  joint.set_child("walls");
-  joint.set_type(msgs::Joint_Type::Joint_Type_FIXED);
-
-  sdf::ElementPtr newJointElem = msgs::JointToSDF(joint);
-  return newJointElem;
-}
-
-sdf::ElementPtr MazeFactory::CreateWall(float row, float col, Direction dir)
-{
-  msgs::Link link;
-  link.set_name("walls");
-  link.set_self_collide(true);
-
   float zero_offset = -UNIT * (MAZE_SIZE/2 - 1);
   float link_x = zero_offset + col * UNIT;
   float link_y = zero_offset + row * UNIT;
 
-  msgs::Pose *link_pose = CreatePose(link_x, link_y, 0.1, 0, 0, 0, 0);
-  msgs::Pose *collision_pose = CreatePose(0, 0, WALL_HEIGHT/2, 0, 0, 0, 0);
-  msgs::Pose *visual_pose = CreatePose(0, 0, WALL_HEIGHT/2 - PAINT_THICKNESS/2,
+  msgs::Pose *visual_pose = CreatePose(0, 0, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2,
                                        0, 0, 0, 0);
-  msgs::Pose *paint_visual_pose = CreatePose(0, 0, WALL_HEIGHT - PAINT_THICKNESS/2,
+  msgs::Pose *paint_visual_pose = CreatePose(0, 0, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2,
                                   0, 0, 0, 0);
-
-  link.set_allocated_pose(link_pose);
 
   msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH,
                                WALL_THICKNESS,
@@ -90,19 +67,10 @@ sdf::ElementPtr MazeFactory::CreateWall(float row, float col, Direction dir)
                                      WALL_THICKNESS,
                                      PAINT_THICKNESS);
 
-  msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH,
-                                  WALL_THICKNESS,
-                                  WALL_HEIGHT);
-
-  msgs::Collision *collision = link.add_collision();
-  collision->set_name("c1");
-  collision->set_allocated_geometry(collision_geo);
-  collision->set_allocated_pose(collision_pose);
-
-  msgs::Visual *visual = link.add_visual();
-  visual->set_name("v1");
-  visual->set_allocated_geometry(visual_geo);
-  visual->set_allocated_pose(visual_pose);
+  msgs::Visual visual;
+  visual.set_name("v1");
+  visual.set_allocated_geometry(visual_geo);
+  visual.set_allocated_pose(visual_pose);
 
   msgs::Material_Script *paint_script = new msgs::Material_Script();
   std::string *uri = paint_script->add_uri();
@@ -112,14 +80,54 @@ sdf::ElementPtr MazeFactory::CreateWall(float row, float col, Direction dir)
   msgs::Material *paint_material = new msgs::Material();
   paint_material->set_allocated_script(paint_script);
 
-  msgs::Visual *paint_visual = link.add_visual();
-  paint_visual->set_name("v1_paint");
-  paint_visual->set_allocated_geometry(paint_visual_geo);
-  paint_visual->set_allocated_pose(paint_visual_pose);
-  paint_visual->set_allocated_material(paint_material);
+  msgs::Visual paint_visual;
+  paint_visual.set_name("v1_paint");
+  paint_visual.set_allocated_geometry(paint_visual_geo);
+  paint_visual.set_allocated_pose(paint_visual_pose);
+  paint_visual.set_allocated_material(paint_material);
 
-  sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
-  return newLinkElem;
+  sdf::ElementPtr visualElem = msgs::VisualToSDF(visual);
+  sdf::ElementPtr visualPaintElem = msgs::VisualToSDF(paint_visual);
+  std::list<sdf::ElementPtr> visuals;
+  visuals.push_front(visualElem);
+  visuals.push_front(visualPaintElem);
+  return visuals;
+}
+
+sdf::ElementPtr MazeFactory::CreateWallCollision(float row, float col, Direction dir)
+{
+  float zero_offset = -UNIT * (MAZE_SIZE/2 - 1);
+  float link_x = zero_offset + col * UNIT;
+  float link_y = zero_offset + row * UNIT;
+
+  msgs::Pose *collision_pose = CreatePose(0, 0, BASE_HEIGHT + WALL_HEIGHT/2, 0, 0, 0, 0);
+
+  msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH,
+                                  WALL_THICKNESS,
+                                  WALL_HEIGHT);
+
+  msgs::Collision collision;
+  collision.set_name("c1");
+  collision.set_allocated_geometry(collision_geo);
+  collision.set_allocated_pose(collision_pose);
+
+  sdf::ElementPtr collisionElem = msgs::CollisionToSDF(collision);
+  return collisionElem;
+}
+
+void MazeFactory::InsertWall(sdf::ElementPtr link, float row, float col, Direction dir)
+{
+  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(0,0,Direction::S);
+  sdf::ElementPtr walls_collision = CreateWallCollision(0,0,Direction::S);
+
+  //insert all the visuals
+  std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
+  while (list_iter != walls_visuals.end())
+  {
+        link->InsertElement(*(list_iter++));
+  }
+
+  link->InsertElement(walls_collision);
 }
 
 msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,

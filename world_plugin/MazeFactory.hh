@@ -27,11 +27,19 @@ namespace gazebo {
       // \brief load from maze_base/model.sdf
       sdf::ElementPtr LoadModel();
 
-      sdf::ElementPtr CreateWalls();
-      sdf::ElementPtr CreateWall(float row,
+      sdf::ElementPtr InsertWalls();
+
+      std::list<sdf::ElementPtr> CreateWallVisual(float row,
         float col,
         Direction dir);
-      sdf::ElementPtr CreateJoint();
+
+      sdf::ElementPtr CreateWallCollision(float row,
+        float col,
+        Direction dir);
+
+      void InsertWall(sdf::ElementPtr link, float row,
+        float col,
+        Direction dir);
 
 			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
 			msgs::Pose *CreatePose(float px, float py, float pz,
