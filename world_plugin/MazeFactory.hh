@@ -1,3 +1,4 @@
+#include <utility>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
@@ -29,17 +30,19 @@ namespace gazebo {
 
       sdf::ElementPtr InsertWalls();
 
-      std::list<sdf::ElementPtr> CreateWallVisual(float row,
-        float col,
+      std::list<sdf::ElementPtr> CreateWallVisual(int row,
+        int col,
         Direction dir);
 
-      sdf::ElementPtr CreateWallCollision(float row,
-        float col,
+      sdf::ElementPtr CreateWallCollision(int row,
+        int col,
         Direction dir);
 
-      void InsertWall(sdf::ElementPtr link, float row,
-        float col,
+      void InsertWall(sdf::ElementPtr link, int row,
+        int col,
         Direction dir);
+
+      std::pair<float, float> ToLocation(int row, int col, Direction dir);
 
 			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
 			msgs::Pose *CreatePose(float px, float py, float pz,
