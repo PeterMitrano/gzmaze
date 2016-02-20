@@ -22,6 +22,8 @@ namespace gazebo {
       sdf::ElementPtr CreateJoint();
 
 			msgs::Geometry *CreateWallGeometry();
+			msgs::Pose *CreatePose(float px, float py, float pz,
+          float ox, float oy, float oz, float ow);
 
 			transport::NodePtr node;
 			sdf::SDFPtr modelSDF;

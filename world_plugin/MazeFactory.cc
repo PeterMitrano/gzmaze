@@ -8,7 +8,7 @@ namespace gazebo
 const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.16;
 const float MazeFactory::WALL_THICKNESS = 0.012;
-const float MazeFactory::BASE_HEIGHT= 0.1;
+const float MazeFactory::BASE_HEIGHT= 0.2;
 
 MazeFactory::MazeFactory(): modelSDF() {}
 
@@ -30,7 +30,7 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   sdf::ElementPtr walls_joint = CreateJoint();
 
   model->InsertElement(walls_link);
-  //model->InsertElement(walls_joint);
+  model->InsertElement(walls_joint);
 
   if (maze_filename == "random")
   {
@@ -50,6 +50,10 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
 sdf::ElementPtr MazeFactory::CreateJoint()
 {
   msgs::Joint joint;
+  joint.set_name("walls_joint");
+  joint.set_parent("base");
+  joint.set_child("walls");
+  joint.set_type(msgs::Joint_Type::Joint_Type_FIXED);
 
   sdf::ElementPtr newJointElem = msgs::JointToSDF(joint);
   return newJointElem;
@@ -61,20 +65,11 @@ sdf::ElementPtr MazeFactory::CreateWalls()
   link.set_name("walls");
   link.set_self_collide(true);
 
-  msgs::Vector3d *position = new msgs::Vector3d();
-  position->set_z(BASE_HEIGHT);
+  msgs::Pose *link_pose = CreatePose(0,0,0.1,0,0,0,0);
+  msgs::Pose *collision_pose = CreatePose(0,0,WALL_HEIGHT/2,0,0,0,0);
+  msgs::Pose *visual_pose = CreatePose(0,0,WALL_HEIGHT/2,0,0,0,0);
 
-  msgs::Quaternion *orientation = new msgs::Quaternion();
-  orientation->set_x(0);
-  orientation->set_y(0);
-  orientation->set_z(0);
-  orientation->set_w(0);
-
-  msgs::Pose *pose = new msgs::Pose;
-  pose->set_allocated_orientation(orientation);
-  pose->set_allocated_position(position);
-
-  link.set_allocated_pose(pose);
+  link.set_allocated_pose(link_pose);
 
   msgs::Geometry *visual_geo = CreateWallGeometry();
   msgs::Geometry *collision_geo = CreateWallGeometry();
@@ -82,13 +77,34 @@ sdf::ElementPtr MazeFactory::CreateWalls()
   msgs::Collision *collision = link.add_collision();
   collision->set_name("c1");
   collision->set_allocated_geometry(collision_geo);
+  collision->set_allocated_pose(collision_pose);
 
   msgs::Visual *visual = link.add_visual();
   visual->set_name("v1");
   visual->set_allocated_geometry(visual_geo);
+  visual->set_allocated_pose(visual_pose);
 
   sdf::ElementPtr newLinkElem = msgs::LinkToSDF(link);
   return newLinkElem;
+}
+
+msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,
+          float ox, float oy, float oz, float ow) {
+  msgs::Vector3d *position = new msgs::Vector3d();
+  position->set_x(px);
+  position->set_y(py);
+  position->set_z(pz);
+
+  msgs::Quaternion *orientation = new msgs::Quaternion();
+  orientation->set_x(ox);
+  orientation->set_y(oy);
+  orientation->set_z(oz);
+  orientation->set_w(ow);
+
+  msgs::Pose *pose = new msgs::Pose;
+  pose->set_allocated_orientation(orientation);
+  pose->set_allocated_position(position);
+
 }
 
 msgs::Geometry *MazeFactory::CreateWallGeometry()
