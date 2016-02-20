@@ -31,7 +31,7 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   sdf::ElementPtr model = LoadModel();
   sdf::ElementPtr base_link = model->GetElement("link");
 
-  InsertWall(base_link, 0, 0, Direction::S);
+  InsertWalls(base_link);
 
   if (maze_filename == "random")
   {
@@ -48,16 +48,26 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   parent->InsertModelSDF(*modelSDF);
 }
 
-
-std::pair<float, float> MazeFactory::ToLocation(int row, int col, Direction dir)
+void MazeFactory::InsertWalls(sdf::ElementPtr base_link)
 {
-  std::pair<float, float> location; //x, y
+  for (int i=0;i<=MAZE_SIZE;i++){
+    InsertWall(base_link, i, i, Direction::S);
+  }
+}
 
-  float zero_offset = -UNIT * (MAZE_SIZE/2 - 1);
-  location.first = zero_offset + col * UNIT;
-  location.second = zero_offset + row * UNIT;
+void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
+{
+  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,Direction::S);
+  sdf::ElementPtr walls_collision = CreateWallCollision(row,col,Direction::S);
 
-  return location;
+  //insert all the visuals
+  std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
+  while (list_iter != walls_visuals.end())
+  {
+    link->InsertElement(*(list_iter++));
+  }
+
+  link->InsertElement(walls_collision);
 }
 
 std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direction dir)
@@ -78,7 +88,9 @@ std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direc
                                      PAINT_THICKNESS);
 
   msgs::Visual visual;
-  visual.set_name("v1");
+  std::string visual_name = "v_" + std::to_string(row)
+                            + "_" + std::to_string(col) + "_" + to_char(dir);
+  visual.set_name(visual_name);
   visual.set_allocated_geometry(visual_geo);
   visual.set_allocated_pose(visual_pose);
 
@@ -91,7 +103,9 @@ std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direc
   paint_material->set_allocated_script(paint_script);
 
   msgs::Visual paint_visual;
-  paint_visual.set_name("v1_paint");
+  std::string paint_visual_name = "paint_v_" + std::to_string(row)
+                                  + "_" + std::to_string(col) + "_" + to_char(dir);
+  paint_visual.set_name(paint_visual_name);
   paint_visual.set_allocated_geometry(paint_visual_geo);
   paint_visual.set_allocated_pose(paint_visual_pose);
   paint_visual.set_allocated_material(paint_material);
@@ -114,7 +128,8 @@ sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir
                                   WALL_HEIGHT);
 
   msgs::Collision collision;
-  collision.set_name("c1");
+  std::string collision_name = "p_" + std::to_string(row) + "_" + std::to_string(col) + "_" + to_char(dir);
+  collision.set_name(collision_name);
   collision.set_allocated_geometry(collision_geo);
   collision.set_allocated_pose(collision_pose);
 
@@ -122,19 +137,15 @@ sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir
   return collisionElem;
 }
 
-void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
+std::pair<float, float> MazeFactory::ToLocation(int row, int col, Direction dir)
 {
-  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,Direction::S);
-  sdf::ElementPtr walls_collision = CreateWallCollision(row,col,Direction::S);
+  std::pair<float, float> location; //x, y
 
-  //insert all the visuals
-  std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
-  while (list_iter != walls_visuals.end())
-  {
-        link->InsertElement(*(list_iter++));
-  }
+  float zero_offset = -(UNIT * (MAZE_SIZE/2));
+  location.first = zero_offset + col * UNIT;
+  location.second = zero_offset + row * UNIT;
 
-  link->InsertElement(walls_collision);
+  return location;
 }
 
 msgs::Pose *MazeFactory::CreatePose(float px, float py, float pz,
@@ -182,6 +193,23 @@ sdf::ElementPtr MazeFactory::LoadModel()
   sdf::readFile("maze_base/model.sdf", modelSDF);
 
   return modelSDF->Root()->GetElement("model");
+}
+
+char MazeFactory::to_char(Direction dir)
+{
+  switch(dir)
+  {
+  case Direction::N:
+    return 'N';
+  case Direction::E:
+    return 'E';
+  case Direction::S:
+    return 'S';
+  case Direction::W:
+    return 'W';
+  default:
+    return '\0';
+  }
 }
 
 GZ_REGISTER_WORLD_PLUGIN(MazeFactory)

@@ -21,22 +21,14 @@
         <pose frame=''>0 0 0.05 0 -0 0</pose>
         <geometry>
           <box>
-            <size>2.88 2.88 0.1</size>
+            <size>2.892 2.892 0.1</size>
           </box>
         </geometry>
         <material>
-          <lighting>1</lighting>
           <script>
             <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/White</name>
           </script>
-          <ambient>0.3 0.3 0.3 1</ambient>
-          <diffuse>0.7 0.7 0.7 1</diffuse>
-          <specular>0.01 0.01 0.01 1</specular>
-          <emissive>0 0 0 1</emissive>
-          <shader type='vertex'>
-            <normal_map>__default__</normal_map>
-          </shader>
         </material>
         <cast_shadows>1</cast_shadows>
         <transparency>0</transparency>
@@ -47,7 +39,7 @@
         <pose frame=''>0 0 0.05 0 -0 0</pose>
         <geometry>
           <box>
-            <size>2.88 2.88 0.1</size>
+            <size>2.892 2.892 0.1</size>
           </box>
         </geometry>
         <surface>

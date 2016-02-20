@@ -25,20 +25,26 @@ namespace gazebo {
 				INVALID = -1
 			};
 
-      // \brief load from maze_base/model.sdf
+      char to_char(Direction dir);
+
+      /// \brief load from maze_base/model.sdf
       sdf::ElementPtr LoadModel();
 
-      sdf::ElementPtr InsertWalls();
+      /// \brief insert allll the walls
+      // \param  base_link this should be the base link of the maze
+      void InsertWalls(sdf::ElementPtr base_link);
+
+      /// \brief insert a wall collision and visual into the given link
+      // \param link the link you're inserting the models to
+      void InsertWall(sdf::ElementPtr link, int row,
+        int col,
+        Direction dir);
 
       std::list<sdf::ElementPtr> CreateWallVisual(int row,
         int col,
         Direction dir);
 
       sdf::ElementPtr CreateWallCollision(int row,
-        int col,
-        Direction dir);
-
-      void InsertWall(sdf::ElementPtr link, int row,
         int col,
         Direction dir);
 
