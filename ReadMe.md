@@ -1,18 +1,44 @@
 # What is gzmaze?
 gzmaze is an attempt at flexing the power of [Gazebo](gazebosim.org)
-The main goal here is to generate a maze in gazebo from a text file
+The main goal here is to generate a maze in gazebo from a text file.
 
-#How it's gonna work
-I think I'm going to need a model plugin and a base SDF model.
-The base SDF model will simply have the base platform and maybe walls on all 4 sides
-The model plugin will look for a maze file name in the SDF and on "Load" of the model
-use it to add walls
+# How it works
+There are two components, a GUI overlay plugin and a world plugin.
 
-#Future goals
-I'd like to be able to generate random mazes with a GUI plugin
-something along the lines of "regenerate" publishing to a topic
-and the model plugin seeing that and regenerating a new maze
+## GUI overlay
+Gazebo has [a tutorial](http://gazebosim.org/tutorials?tut=gui_overlay&cat=user_input) on simple GUI overlays. I followed that tutorial, and extended it slightly.
+There are two buttons and a textedit. When the buttons are clicked, a message is published to the topic ~/maze/regenerate
 
-It would also be interesting if somehow I could add a file browse dialog
-that could get a file name and them publish that
-then the maze would reload to look like that maze
+## World plugin
+This is where the meat of the code is. We subscribe to ~/maze/regenerate and build mazes using gazebo messages. This plugin took example from the gazebo [Model editor](https://bitbucket.org/osrf/gazebo/src/default/gazebo/gui/model/). Essentially, it uses gazebo messages to construct Collision and Links. There links are then converted to and sdf::ElementPtr via the convenient funtions VisualToSDF and CollisionToSDF.
+
+# Requirements
+cmake 2.8
+Gazebo 6/7 (currently useing 7, but 6 will probably work too)
+
+# Building
+cd gui_plugin
+mkdir build
+cd build
+cmake .. && make
+cd world_plugin
+mkdir build
+cd build
+cmake .. && make
+
+# Running
+Be sure to add the following to your `.gazebo/gui.ini` file
+
+```
+    [overlay_plugins]
+    filenames=libregenerate_widget.so
+```
+
+    source setup.sh #this will setup the environment variables you need
+    gazebo --verbose gzmaze.world
+
+# The input files
+look at sample_maze.mz for an example
+
+## TODO:
+ - random generation doesn't actually do anything right now
