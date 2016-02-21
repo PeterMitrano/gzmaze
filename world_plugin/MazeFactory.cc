@@ -1,6 +1,7 @@
 #include "MazeFactory.hh"
 
 #include <ignition/math/Pose3.hh>
+#include <sstream>
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
@@ -8,7 +9,6 @@
 namespace gazebo
 {
 
-const int MazeFactory::MAZE_SIZE = 16;
 const float MazeFactory::UNIT = 0.18; //distance between centers of squares
 const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.192;
@@ -17,7 +17,7 @@ const float MazeFactory::BASE_HEIGHT= 0.1;
 const float MazeFactory::PAINT_THICKNESS = 0.01;
 
 
-MazeFactory::MazeFactory(): modelSDF() {}
+MazeFactory::MazeFactory(): distribution(0,4) {}
 
 void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 {
@@ -25,6 +25,9 @@ void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   node = transport::NodePtr(new transport::Node());
   node->Init(parent->GetName());
   sub = node->Subscribe("~/maze/regenerate", &MazeFactory::Regenerate, this);
+
+  //seed random generator
+  generator.seed(time(0));
 }
 
 void MazeFactory::Regenerate(ConstGzStringPtr &msg)
@@ -100,6 +103,86 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
 
 void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
 {
+  //reset
+  for (int i=0;i<MAZE_SIZE;i++){
+    for (int j=0;j<MAZE_SIZE;j++){
+      visited[i][j] = false;
+      for (int k=0;k<4;k++){
+        connected[i][j][k] = false;
+      }
+    }
+  }
+
+  //start with maze "end" in the center
+  InsertRandomNeighbor(MAZE_SIZE/2,MAZE_SIZE/2);
+
+  for (int i=0;i<MAZE_SIZE;i++){
+    std::stringstream line;
+    for (int j=0;j<MAZE_SIZE;j++){
+      line << "{";
+      if (!connected[i][j][2]) InsertWall(link, i, j, Direction::S);
+      if (!connected[i][j][3]) InsertWall(link, i, j, Direction::W);
+      for (int k=0;k<4;k++){
+        line << connected[i][j][k] << ",";
+      }
+      line << "} ";
+    }
+    gzmsg << line.str() << std::endl;
+
+    //add outer walls
+    InsertWall(link, i, 0, Direction::W);
+    InsertWall(link, i, MAZE_SIZE-1, Direction::E);
+    InsertWall(link, 0, i, Direction::N);
+    InsertWall(link, MAZE_SIZE-1, i, Direction::S);
+  }
+}
+
+void MazeFactory::InsertRandomNeighbor(int row, int col)
+{
+  //make sure it's in bounds
+  if (row >= MAZE_SIZE || row < 0 || col >= MAZE_SIZE || col < 0) return;
+
+  //mark current cell visited
+  visited[row][col] = true;
+
+  //select random neighbor
+  int neighbor = distribution(generator);
+
+  for (int i=0;i<4;i++){
+    int opposite = (neighbor - 2)%4;
+
+    switch(neighbor){
+      case 0:
+        if (!visited[row-1][col]) {
+          connected[row][col][neighbor] = true;
+          connected[row-1][col][opposite] = true;
+          InsertRandomNeighbor(row-1, col);
+        }
+        break;
+      case 1:
+        if (!visited[row][col+1]) {
+          connected[row][col][neighbor] = true;
+          connected[row][col+1][opposite] = true;
+          InsertRandomNeighbor(row, col+1);
+        }
+        break;
+      case 2:
+        if (!visited[row+1][col]) {
+          connected[row][col][neighbor] = true;
+          connected[row+1][col][opposite] = true;
+          InsertRandomNeighbor(row+1, col);
+        }
+        break;
+      case 3:
+        if (!visited[row][col-1]) {
+          connected[row][col][neighbor] = true;
+          connected[row][col-1][opposite] = true;
+          InsertRandomNeighbor(row, col-1);
+        }
+        break;
+    }
+    neighbor = (neighbor+1)%4;
+  }
 }
 
 void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
