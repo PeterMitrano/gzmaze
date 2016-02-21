@@ -1,5 +1,5 @@
 # What is gzmaze?
-gzmaze is an attempt at flexing the power of [Gazebo](https://gazebosim.org)
+gzmaze is an attempt at flexing the power of [Gazebo](http://gazebosim.org)
 The main goal here is to generate a maze in gazebo from a text file.
 
 # How it works
