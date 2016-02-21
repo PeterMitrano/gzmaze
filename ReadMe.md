@@ -17,14 +17,15 @@ cmake 2.8
 Gazebo 6/7 (currently useing 7, but 6 will probably work too)
 
 # Building
-cd gui_plugin
-mkdir build
-cd build
-cmake .. && make
-cd world_plugin
-mkdir build
-cd build
-cmake .. && make
+
+    cd gui_plugin
+    mkdir build
+    cd build
+    cmake .. && make
+    cd world_plugin
+    mkdir build
+    cd build
+    cmake .. && make
 
 # Running
 Be sure to add the following to your `.gazebo/gui.ini` file
