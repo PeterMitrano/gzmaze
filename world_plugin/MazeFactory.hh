@@ -38,7 +38,8 @@ namespace gazebo {
 
       /// \brief insert allll the walls
       // \param  base_link this should be the base link of the maze
-      void InsertWalls(sdf::ElementPtr base_link);
+      void InsertWallsFromFile(sdf::ElementPtr base_link);
+      void InsertRandomWalls(sdf::ElementPtr base_link);
 
       /// \brief insert a wall collision and visual into the given link
       // \param link the link you're inserting the models to
@@ -58,10 +59,14 @@ namespace gazebo {
 			msgs::Pose *CreatePose(int row, int col, float z, Direction dir);
 
 			transport::NodePtr node;
-			sdf::SDFPtr modelSDF;
 
 			transport::SubscriberPtr sub;
+
 			physics::WorldPtr parent;
+
+			sdf::SDFPtr modelSDF;
+
+      std::string maze_filename;
 
       const static int MAZE_SIZE;
       const static float WALL_LENGTH,

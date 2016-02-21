@@ -1,6 +1,8 @@
 #include "MazeFactory.hh"
 
 #include <ignition/math/Pose3.hh>
+#include <fstream>
+#include <cstdlib>
 #include <cmath>
 
 namespace gazebo
@@ -27,43 +29,69 @@ void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 
 void MazeFactory::Regenerate(ConstGzStringPtr &msg)
 {
-  std::string maze_filename = msg->data();
+  maze_filename = msg->data();
 
   sdf::ElementPtr model = LoadModel();
   sdf::ElementPtr base_link = model->GetElement("link");
 
-  InsertWalls(base_link);
 
   if (maze_filename == "random")
   {
     //create random maze here
+    //InsertRandomWalls(base_link);
   }
   else
   {
     //load maze from file
+    gzmsg << "loading from file " << maze_filename << std::endl;
+    InsertWallsFromFile(base_link);
+    model->GetAttribute("name")->Set("my_maze");
+    model->GetElement("pose")->Set(
+      math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
+    parent->InsertModelSDF(*modelSDF);
   }
-
-  model->GetAttribute("name")->Set("my_maze");
-  model->GetElement("pose")->Set(
-    math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
-  parent->InsertModelSDF(*modelSDF);
 }
 
-void MazeFactory::InsertWalls(sdf::ElementPtr base_link)
+void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
 {
-  for (int row=0;row<MAZE_SIZE;row++){
-    for (int col=0;col<MAZE_SIZE;col++){
-      InsertWall(base_link, row, col, Direction::N);
-      InsertWall(base_link, row, col, Direction::W);
+  std::fstream fs;
+  fs.open(maze_filename, std::fstream::in);
+
+  if (fs.good()){
+    std::string line;
+
+    //look West and North to connect any nodes
+    for (int i=0;i<MAZE_SIZE;i++){ //read in each line
+      std::getline(fs, line);
+
+      if (!fs) {
+        gzmsg  << "getline failed" << std::endl;
+        return;
+      }
+
+      int charPos = 0;
+      for (int j=0;j<MAZE_SIZE;j++){
+        if (line.at(charPos) == '|'){
+          //add a wall on the west
+          InsertWall(base_link, i,j,Direction::W);
+        }
+        charPos++;
+        if (line.at(charPos) == '_'){
+          //add a wall on the south
+          InsertWall(base_link, i,j,Direction::S);
+        }
+        charPos++;
+      }
+    }
+
+    //add east and north walls
+    for (int i=0;i<MAZE_SIZE;i++){
+      InsertWall(base_link, i, MAZE_SIZE - 1, Direction::E);
+      InsertWall(base_link, 0, i, Direction::N);
     }
   }
-
-  for (int col=0;col<MAZE_SIZE;col++){
-    InsertWall(base_link, MAZE_SIZE-1, col, Direction::S);
-  }
-
-  for (int row=0;row<MAZE_SIZE;row++){
-    InsertWall(base_link, row, MAZE_SIZE-1, Direction::E);
+  else {
+    gzmsg << "failed to load file " << maze_filename << std::endl;
   }
 }
 
@@ -87,13 +115,8 @@ std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direc
   msgs::Pose *visual_pose = CreatePose(row, col, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2, dir);
   msgs::Pose *paint_visual_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2, dir);
 
-  msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH,
-                               WALL_THICKNESS,
-                               WALL_HEIGHT - PAINT_THICKNESS);
-
-  msgs::Geometry *paint_visual_geo = CreateBoxGeometry(WALL_LENGTH,
-                                     WALL_THICKNESS,
-                                     PAINT_THICKNESS);
+  msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, WALL_HEIGHT - PAINT_THICKNESS);
+  msgs::Geometry *paint_visual_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, PAINT_THICKNESS);
 
   msgs::Visual visual;
   std::string visual_name = "v_" + std::to_string(row)
@@ -130,9 +153,7 @@ sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir
 {
   msgs::Pose *collision_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT/2, dir);
 
-  msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH,
-                                  WALL_THICKNESS,
-                                  WALL_HEIGHT);
+  msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, WALL_HEIGHT);
 
   msgs::Collision collision;
   std::string collision_name = "p_" + std::to_string(row) + "_" + std::to_string(col) + "_" + to_char(dir);
@@ -175,8 +196,6 @@ msgs::Pose *MazeFactory::CreatePose(int row, int col, float z, Direction dir) {
   position->set_z(z);
 
   msgs::Quaternion *orientation = new msgs::Quaternion();
-  orientation->set_x(0);
-  orientation->set_y(0);
   orientation->set_z(sin(z_rot/2));
   orientation->set_w(cos(z_rot/2));
 
