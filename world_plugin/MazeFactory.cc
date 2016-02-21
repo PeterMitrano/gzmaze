@@ -34,22 +34,22 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   sdf::ElementPtr model = LoadModel();
   sdf::ElementPtr base_link = model->GetElement("link");
 
-
   if (maze_filename == "random")
   {
     //create random maze here
-    //InsertRandomWalls(base_link);
+    InsertRandomWalls(base_link);
   }
   else
   {
     //load maze from file
     gzmsg << "loading from file " << maze_filename << std::endl;
     InsertWallsFromFile(base_link);
-    model->GetAttribute("name")->Set("my_maze");
-    model->GetElement("pose")->Set(
-      math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
-    parent->InsertModelSDF(*modelSDF);
   }
+
+  model->GetAttribute("name")->Set("my_maze");
+  model->GetElement("pose")->Set(
+    math::Pose(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0)));
+  parent->InsertModelSDF(*modelSDF);
 }
 
 void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
@@ -58,6 +58,9 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
   fs.open(maze_filename, std::fstream::in);
 
   if (fs.good()){
+    //clear the old walls
+    all_wall_elements.clear();
+
     std::string line;
 
     //look West and North to connect any nodes
@@ -95,10 +98,20 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
   }
 }
 
+void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
+{
+}
+
 void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
 {
   std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,dir);
   sdf::ElementPtr walls_collision = CreateWallCollision(row,col,dir);
+
+  //add all those to a list so we can remove them for next time.
+  all_wall_elements.insert(all_wall_elements.end(),
+      walls_visuals.begin(),
+      walls_visuals.end());
+  all_wall_elements.push_front(walls_collision);
 
   //insert all the visuals
   std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();

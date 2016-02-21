@@ -20,16 +20,16 @@ namespace gazebo {
    */
   Direction operator++(Direction& dir, int);
 
-	class MazeFactory: public WorldPlugin {
+  class MazeFactory: public WorldPlugin {
 
-		public:
-			MazeFactory();
+    public:
+      MazeFactory();
 
-			void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
+      void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
 
-			void Regenerate(ConstGzStringPtr &msg);
+      void Regenerate(ConstGzStringPtr &msg);
 
-		private:
+    private:
 
       char to_char(Direction dir);
 
@@ -44,27 +44,29 @@ namespace gazebo {
       /// \brief insert a wall collision and visual into the given link
       // \param link the link you're inserting the models to
       void InsertWall(sdf::ElementPtr link, int row,
-        int col,
-        Direction dir);
+          int col,
+          Direction dir);
 
       std::list<sdf::ElementPtr> CreateWallVisual(int row,
-        int col,
-        Direction dir);
+          int col,
+          Direction dir);
 
       sdf::ElementPtr CreateWallCollision(int row,
-        int col,
-        Direction dir);
+          int col,
+          Direction dir);
 
-			msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
-			msgs::Pose *CreatePose(int row, int col, float z, Direction dir);
+      msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
+      msgs::Pose *CreatePose(int row, int col, float z, Direction dir);
 
-			transport::NodePtr node;
+      std::list<sdf::ElementPtr> all_wall_elements;
 
-			transport::SubscriberPtr sub;
+      transport::NodePtr node;
 
-			physics::WorldPtr parent;
+      transport::SubscriberPtr sub;
 
-			sdf::SDFPtr modelSDF;
+      physics::WorldPtr parent;
+
+      sdf::SDFPtr modelSDF;
 
       std::string maze_filename;
 
@@ -76,6 +78,6 @@ namespace gazebo {
             UNIT,
             BASE_HEIGHT;
 
-	};
+  };
 }
 
