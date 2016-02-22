@@ -117,17 +117,10 @@ void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
   InsertRandomNeighbor(MAZE_SIZE/2,MAZE_SIZE/2);
 
   for (int i=0;i<MAZE_SIZE;i++){
-    std::stringstream line;
     for (int j=0;j<MAZE_SIZE;j++){
-      line << "{";
-      if (!connected[i][j][2]) InsertWall(link, i, j, Direction::S);
-      if (!connected[i][j][3]) InsertWall(link, i, j, Direction::W);
-      for (int k=0;k<4;k++){
-        line << connected[i][j][k] << ",";
-      }
-      line << "} ";
+      if (!connected[i][j][3]) { InsertWall(link, i, j, Direction::W);}
+      if (!connected[i][j][2]) { InsertWall(link, i, j, Direction::S);}
     }
-    gzmsg << line.str() << std::endl;
 
     //add outer walls
     InsertWall(link, i, 0, Direction::W);
@@ -149,34 +142,32 @@ void MazeFactory::InsertRandomNeighbor(int row, int col)
   int neighbor = distribution(generator);
 
   for (int i=0;i<4;i++){
-    int opposite = (neighbor - 2)%4;
-
     switch(neighbor){
       case 0:
-        if (!visited[row-1][col]) {
+        if (row >= 0 && !visited[row-1][col]) {
           connected[row][col][neighbor] = true;
-          connected[row-1][col][opposite] = true;
+          connected[row-1][col][2] = true;
           InsertRandomNeighbor(row-1, col);
         }
         break;
       case 1:
-        if (!visited[row][col+1]) {
+        if (col < MAZE_SIZE && !visited[row][col+1]) {
           connected[row][col][neighbor] = true;
-          connected[row][col+1][opposite] = true;
+          connected[row][col+1][3] = true;
           InsertRandomNeighbor(row, col+1);
         }
         break;
       case 2:
-        if (!visited[row+1][col]) {
+        if (row < MAZE_SIZE && !visited[row+1][col]) {
           connected[row][col][neighbor] = true;
-          connected[row+1][col][opposite] = true;
+          connected[row+1][col][0] = true;
           InsertRandomNeighbor(row+1, col);
         }
         break;
       case 3:
-        if (!visited[row][col-1]) {
+        if (col >= 0 && !visited[row][col-1]) {
           connected[row][col][neighbor] = true;
-          connected[row][col-1][opposite] = true;
+          connected[row][col-1][1] = true;
           InsertRandomNeighbor(row, col-1);
         }
         break;
