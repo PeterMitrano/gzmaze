@@ -2,7 +2,7 @@
 <sdf version='1.6'>
   <model name='mouse'>
     <link name='base'>
-      <pose frame=''>0 -0 0.023333 0 -0 0</pose>
+      <pose frame=''>0 -0 0.123333 0 -0 0</pose>
       <inertial>
         <mass>0.5</mass>
         <inertia>
@@ -30,6 +30,12 @@
             <size>0.1 0.1 0.1</size>
           </box>
         </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Blue</name>
+          </script>
+        </material>
       </visual>
       <collision name='castor_collision'>
         <pose frame=''>0 0.04 -0.04 0 -0 0</pose>
@@ -98,7 +104,7 @@
       </collision>
     </link>
     <link name='right_wheel'>
-      <pose frame=''>0.055 -0.02 -0.01 0 1.57079 0</pose>
+      <pose frame=''>0.055 -0.02 0.09 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -189,7 +195,7 @@
       </collision>
     </link>
     <link name='left_wheel'>
-      <pose frame=''>-0.055 -0.02 -0.01 0 1.57079 0</pose>
+      <pose frame=''>-0.055 -0.02 0.09 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -345,27 +351,9 @@
     </joint>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-		<plugin name="actuator_plugin" filename="libActuatorPlugin.so">
-			<actuator>
-				<name>right_motor</name>
-				<joint>right_wheel_joint</joint>
-				<index>0</index>
-				<type>electric_motor</type>
-				<power>4</power>
-				<max_velocity>1</max_velocity>
-				<max_torque>1.0</max_torque>
-			</actuator>
-		</plugin>
-		<plugin name="actuator_plugin" filename="libActuatorPlugin.so">
-			<actuator>
-				<name>left_motor</name>
-				<joint>left_wheel_joint</joint>
-				<index>0</index>
-				<type>electric_motor</type>
-				<power>4</power>
-				<max_velocity>1</max_velocity>
-				<max_torque>1.0</max_torque>
-			</actuator>
+		<plugin name="mouse_plugin" filename="libMousePlugin.so">
+      <left_wheel_joint>left_wheel_joint</left_wheel_joint>
+      <right_wheel_joint>left_wheel_joint</right_wheel_joint>
 		</plugin>
   </model>
 </sdf>
