@@ -2,7 +2,7 @@
 <sdf version='1.6'>
   <model name='mouse'>
     <link name='base'>
-      <pose frame=''>0 -0 0.123333 0 -0 0</pose>
+      <pose frame=''>0 -0 0.223333 0 -0 0</pose>
       <inertial>
         <mass>0.5</mass>
         <inertia>
@@ -104,7 +104,7 @@
       </collision>
     </link>
     <link name='right_wheel'>
-      <pose frame=''>0.055 -0.02 0.09 0 1.57079 0</pose>
+      <pose frame=''>0.055 -0.02 0.19 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -195,7 +195,7 @@
       </collision>
     </link>
     <link name='left_wheel'>
-      <pose frame=''>-0.055 -0.02 0.09 0 1.57079 0</pose>
+      <pose frame=''>-0.055 -0.02 0.19 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
