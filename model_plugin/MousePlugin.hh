@@ -24,10 +24,14 @@ class MousePlugin: public ModelPlugin {
     void ControlCallback(ConstGzStringPtr &msg);
 
     physics::ModelPtr model;
+    physics::LinkPtr body;
     event::ConnectionPtr updateConn;
     transport::NodePtr node;
     transport::SubscriberPtr control_sub;
     transport::PublisherPtr sense_pub;
     transport::PublisherPtr pose_pub;
+
+    const float p_gain = 1;
+    const float F = 0.05;
 
 };
