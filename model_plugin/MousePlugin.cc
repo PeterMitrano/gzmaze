@@ -39,11 +39,12 @@ void MousePlugin::Update(const common::UpdateInfo &info) {
   pose.set_allocated_position(pos);
   pose.set_allocated_orientation(rot);
 
+  pose_pub->Publish(pose);
+
   msgs::GzString scan;
   scan.set_data("1010");
 
   sense_pub->Publish(scan);
-  pose_pub->Publish(pose);
 }
 
 void MousePlugin::ControlCallback(ConstGzStringPtr &msg) {
