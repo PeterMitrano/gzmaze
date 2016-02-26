@@ -373,7 +373,7 @@
     <allow_auto_disable>1</allow_auto_disable>
 		<plugin name="mouse_plugin" filename="libMousePlugin.so">
       <left_wheel_joint>left_wheel_joint</left_wheel_joint>
-      <right_wheel_joint>left_wheel_joint</right_wheel_joint>
+      <right_wheel_joint>right_wheel_joint</right_wheel_joint>
       <body>base</body>
 		</plugin>
   </model>
