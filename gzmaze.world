@@ -9,6 +9,10 @@
       <uri>model://sun</uri>
     </include>
 
+    <include>
+      <uri>model://mouse</uri>
+    </include>
+
     <gui>
       <plugin name="sample" filename="libregenerate_widget.so"/>
     </gui>

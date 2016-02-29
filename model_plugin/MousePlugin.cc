@@ -13,7 +13,6 @@ void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   node->Init();
   control_sub = node->Subscribe("~/mouse/control", &MousePlugin::ControlCallback, this);
   pose_pub = node->Advertise<msgs::Pose>("~/mouse/pose");
-  sense_pub = node->Advertise<msgs::GzString>("~/mouse/sense");
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
@@ -22,6 +21,16 @@ void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 }
 
 void MousePlugin::Update(const common::UpdateInfo &info) {
+  PublishInfo();
+  ControlMotors();
+}
+
+void MousePlugin::ControlMotors(){
+  left_wheel_joint->SetForce(0, left_force);
+  right_wheel_joint->SetForce(0, right_force);
+}
+
+void MousePlugin::PublishInfo(){
   math::Pose realtivePose = body->GetWorldPose();
 
   msgs::Vector3d *pos = new msgs::Vector3d();
@@ -40,29 +49,23 @@ void MousePlugin::Update(const common::UpdateInfo &info) {
   pose.set_allocated_orientation(rot);
 
   pose_pub->Publish(pose);
-
-  msgs::GzString scan;
-  scan.set_data("1010");
-
-  sense_pub->Publish(scan);
 }
 
 void MousePlugin::ControlCallback(ConstGzStringPtr &msg) {
-  gzmsg << msg->data() << std::endl;
-  if (msg->data() == "forward") {
-    left_wheel_joint->SetForce(0, F);
-    right_wheel_joint->SetForce(0, F);
+  if (msg->data().compare("forward") == 0) {
+    left_force = F;
+    right_force = F;
   }
-  else if (msg->data() == "turn cw") {
-    left_wheel_joint->SetForce(0, F);
-    right_wheel_joint->SetForce(0, -F);
+  else if (msg->data().compare("turn cw") == 0) {
+    left_force = -F;
+    right_force = F;
   }
-  else if (msg->data() == "turn ccw") {
-    left_wheel_joint->SetForce(0, -F);
-    right_wheel_joint->SetForce(0, F);
+  else if (msg->data().compare("turn ccw") == 0) {
+    left_force = F;
+    right_force = -F;
   }
-  else if (msg->data() == "stop") {
-    left_wheel_joint->SetForce(0, 0);
-    right_wheel_joint->SetForce(0, 0);
+  else if (msg->data().compare("stop") == 0) {
+    left_force = 0;
+    right_force = 0;
   }
 }

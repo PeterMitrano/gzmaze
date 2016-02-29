@@ -23,15 +23,17 @@ class MousePlugin: public ModelPlugin {
     /// \brief Callback for receiving msgs and storing the signal.
     void ControlCallback(ConstGzStringPtr &msg);
 
+    void PublishInfo();
+    void ControlMotors();
+
     physics::ModelPtr model;
     physics::LinkPtr body;
     event::ConnectionPtr updateConn;
     transport::NodePtr node;
     transport::SubscriberPtr control_sub;
-    transport::PublisherPtr sense_pub;
     transport::PublisherPtr pose_pub;
 
-    const float p_gain = 1;
-    const float F = 0.05;
+    float left_force, right_force;
+    const float F = .03;
 
 };

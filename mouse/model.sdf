@@ -308,7 +308,7 @@
       <child>left_wheel</child>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0 0 -1</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>-1.79769e+308</lower>
@@ -341,7 +341,7 @@
       <child>right_wheel</child>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <axis>
-        <xyz>0 0 1</xyz>
+        <xyz>0 0 -1</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>-1.79769e+308</lower>
