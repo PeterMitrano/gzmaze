@@ -38,11 +38,10 @@ Be sure to add the following to your `.gazebo/gui.ini` file
     filenames=libregenerate_widget.so
 ```
 
-    source setup.sh #this will setup the environment variables you need
-    gazebo --verbose gzmaze.world
+   ./setup.sh #this will setup the environment variables you need and run gazebo
 
 # The input files
 look at sample_maze.mz for an example
 
 # TODO:
- - random generation doesn't actually do anything right now
+ - let the mouse model actually drive around
