@@ -51,21 +51,7 @@ void MousePlugin::PublishInfo(){
   pose_pub->Publish(pose);
 }
 
-void MousePlugin::ControlCallback(ConstGzStringPtr &msg) {
-  if (msg->data().compare("forward") == 0) {
-    left_force = F;
-    right_force = F;
-  }
-  else if (msg->data().compare("turn cw") == 0) {
-    left_force = -F;
-    right_force = F;
-  }
-  else if (msg->data().compare("turn ccw") == 0) {
-    left_force = F;
-    right_force = -F;
-  }
-  else if (msg->data().compare("stop") == 0) {
-    left_force = 0;
-    right_force = 0;
-  }
+void MousePlugin::ControlCallback(ConstVector2dPtr &msg) {
+  left_force = msg->x();
+  right_force = msg->y();
 }

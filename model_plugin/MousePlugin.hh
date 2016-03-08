@@ -21,7 +21,7 @@ class MousePlugin: public ModelPlugin {
     physics::JointPtr right_wheel_joint;
 
     /// \brief Callback for receiving msgs and storing the signal.
-    void ControlCallback(ConstGzStringPtr &msg);
+    void ControlCallback(ConstVector2dPtr &msg);
 
     void PublishInfo();
     void ControlMotors();
@@ -34,6 +34,4 @@ class MousePlugin: public ModelPlugin {
     transport::PublisherPtr pose_pub;
 
     float left_force, right_force;
-    const float F = .03;
-
 };
