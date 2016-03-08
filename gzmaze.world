@@ -10,6 +10,7 @@
     </include>
 
     <include>
+      <pose>-1.344 1.344 0.125 0 0 3.1415926</pose>
       <uri>model://mouse</uri>
     </include>
 
