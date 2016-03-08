@@ -6,17 +6,17 @@
       <inertial>
         <mass>0.5</mass>
         <inertia>
-          <ixx>0.0008333</ixx>
+          <ixx>0.000220833333333</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0005208</iyy>
+          <iyy>0.000220833333333</iyy>
           <iyz>0</iyz>
-          <izz>0.0005208</izz>
+          <izz>0.000408333333333</izz>
         </inertia>
         <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <visual name='castor_visual'>
-        <pose frame=''>0 0.04 -0.02 0 -0 0</pose>
+        <pose frame=''>0 0.03 -0.02 0 -0 0</pose>
         <geometry>
           <sphere>
             <radius>0.005</radius>
@@ -27,7 +27,7 @@
         <pose frame=''>0 0 -0.01 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.1 0.1 0.02</size>
+            <size>0.07 0.07 0.02</size>
           </box>
         </geometry>
         <material>
@@ -38,7 +38,7 @@
         </material>
       </visual>
       <collision name='castor_collision'>
-        <pose frame=''>0 0.04 -0.02 0 -0 0</pose>
+        <pose frame=''>0 0.03 -0.02 0 -0 0</pose>
         <geometry>
           <sphere>
             <radius>0.005</radius>
@@ -47,8 +47,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
+              <mu>0</mu>
+              <mu2>0</mu2>
               <fdir1>0 0 0</fdir1>
               <slip1>1</slip1>
               <slip2>1</slip2>
@@ -75,7 +75,7 @@
         <pose frame=''>0 0 -0.01 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.1 0.1 0.02</size>
+            <size>0.07 0.07 0.02</size>
           </box>
         </geometry>
         <surface>
@@ -124,7 +124,7 @@
       </sensor>
     </link>
     <link name='right_wheel'>
-      <pose frame=''>0.055 -0.02 0 0 1.57079 0</pose>
+      <pose frame=''>0.04 -0.02 0 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -215,7 +215,7 @@
       </collision>
     </link>
     <link name='left_wheel'>
-      <pose frame=''>-0.055 -0.02 0 0 1.57079 0</pose>
+      <pose frame=''>-0.04 -0.02 0 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
