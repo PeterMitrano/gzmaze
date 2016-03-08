@@ -1,14 +1,15 @@
-export GAZEBO_PLUGIN_PATH=/home/peter/Projects/gzmaze/world_plugin/build:\
-/home/peter/Projects/gzmaze/gui_plugin/build:\
-/home/peter/Projects/gzmaze/model_plugin/build:\
+export GAZEBO_PLUGIN_PATH=${HOME}/Projects/smartmouse/gzmaze/world_plugin/build:\
+${HOME}/Projects/smartmouse/gzmaze/gui_plugin/build:\
+${HOME}/Projects/smartmousegzmaze/model_plugin/build:\
 /usr/lib/x86_64-linux-gnu/gazebo-7/plugins:\
 $GAZEBO_PLUGIN_PATH
 
-export LD_LIBRARY_PATH=/home/peter/Projects/gzmaze/world_plugin/build:\
-/home/peter/Projects/gzmaze/gui_plugin/build:\
-/home/peter/Projects/gzmaze/model_plugin/build:\
+export LD_LIBRARY_PATH=${HOME}/Projects/smartmouse/gzmaze/world_plugin/build:\
+${HOME}/Projects/smartmouse/gzmaze/gui_plugin/build:\
+${HOME}/Projects/smartmouse/gzmaze/model_plugin/build:\
+/usr/local/lib/x86_64-linux-gnu/gazebo-7/plugins:\
 $LD_LIBRARY_PATH
 
-export GAZEBO_MODEL_PATH=/home/peter/Projects/gzmaze
+export GAZEBO_MODEL_PATH=${HOME}/Projects/smartmouse/gzmaze
 
-gazebo --verbose gzmaze.world
+gazebo -u --verbose gzmaze.world
