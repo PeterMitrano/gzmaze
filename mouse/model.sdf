@@ -4,16 +4,16 @@
     <link name='base'>
       <pose>0 -0 0.005 0 -0 0</pose>
       <inertial>
+        <pose frame=''>0 0.01 0 0 -0 0</pose>
         <mass>0.5</mass>
         <inertia>
-          <ixx>0.000220833333333</ixx>
+          <ixx>0.00022083</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.000220833333333</iyy>
+          <iyy>0.00022083</iyy>
           <iyz>0</iyz>
-          <izz>0.000408333333333</izz>
+          <izz>0.00040833</izz>
         </inertia>
-        <pose frame=''>0 0 0 0 -0 0</pose>
       </inertial>
       <visual name='castor_visual'>
         <pose frame=''>0 0.03 -0.02 0 -0 0</pose>
@@ -101,11 +101,11 @@
         </surface>
       </collision>
       <sensor name="laser" type="ray">
-        <pose>0 0.01 0.004 0 0 0</pose>
+        <pose>0 0.03 0.004 0 0 0</pose>
         <ray>
           <scan>
             <horizontal>
-              <samples>6</samples>
+              <samples>5</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
               <max_angle>3.141459265</max_angle>
@@ -124,7 +124,7 @@
       </sensor>
     </link>
     <link name='right_wheel'>
-      <pose frame=''>0.04 -0.02 0 0 1.57079 0</pose>
+      <pose frame=''>0.04 0.0 0 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -212,7 +212,7 @@
       </collision>
     </link>
     <link name='left_wheel'>
-      <pose frame=''>-0.04 -0.02 0 0 1.57079 0</pose>
+      <pose frame=''>-0.04 0.0 0 0 1.57079 0</pose>
       <inertial>
         <mass>0.01</mass>
         <inertia>
@@ -313,12 +313,13 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.005</damping>
+          <damping>0.01</damping>
           <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
         <ode>
+          <implicit_spring_damper>true</implicit_spring_damper>
           <limit>
             <cfm>0</cfm>
             <erp>0.2</erp>
@@ -346,12 +347,13 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0.005</damping>
+          <damping>0.01</damping>
           <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
         <ode>
+          <implicit_spring_damper>true</implicit_spring_damper>
           <limit>
             <cfm>0</cfm>
             <erp>0.2</erp>
