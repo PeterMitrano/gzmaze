@@ -13,7 +13,7 @@ const float MazeFactory::UNIT = 0.18; //distance between centers of squares
 const float MazeFactory::WALL_HEIGHT = 0.05;
 const float MazeFactory::WALL_LENGTH = 0.192;
 const float MazeFactory::WALL_THICKNESS = 0.012;
-const float MazeFactory::BASE_HEIGHT= 0.1;
+const float MazeFactory::BASE_HEIGHT= 0.001;
 const float MazeFactory::PAINT_THICKNESS = 0.01;
 
 

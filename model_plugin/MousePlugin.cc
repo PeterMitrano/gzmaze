@@ -26,8 +26,8 @@ void MousePlugin::Update(const common::UpdateInfo &info) {
 }
 
 void MousePlugin::ControlMotors(){
-  left_wheel_joint->SetForce(0, left_force);
-  right_wheel_joint->SetForce(0, right_force);
+  //left_wheel_joint->SetForce(0, left_force);
+  //right_wheel_joint->SetForce(0, right_force);
 }
 
 void MousePlugin::PublishInfo(){

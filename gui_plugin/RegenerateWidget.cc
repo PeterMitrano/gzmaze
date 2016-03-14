@@ -28,7 +28,7 @@ RegenerateWidget::RegenerateWidget()
   QPushButton *randomButton = new QPushButton(tr("Regenerate Randomly"));
   connect(randomButton, SIGNAL(clicked()), this, SLOT(OnRandomButton()));
 
-  textEdit = new QTextEdit(tr("~/Projects/gzmaze/sample_maze.mz"));
+  textEdit = new QTextEdit(tr("~/Projects/smartmouse/gzmaze/simple.mz"));
   textEdit->setContentsMargins(1, 1, 1, 1);
   textEdit->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
   textEdit->setObjectName("maze_filename");

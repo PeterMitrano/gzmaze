@@ -105,10 +105,10 @@
         <ray>
           <scan>
             <horizontal>
-              <samples>4</samples>
+              <samples>6</samples>
               <resolution>1</resolution>
-              <min_angle>0</min_angle>
-              <max_angle>4.712388980</max_angle>
+              <min_angle>1.57076326</min_angle>
+              <max_angle>4.71238898</max_angle>
             </horizontal>
           </scan>
           <range>
@@ -178,11 +178,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <mu>10</mu>
+              <mu2>10</mu2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -267,11 +264,8 @@
         <surface>
           <friction>
             <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
+              <mu>10</mu>
+              <mu2>10</mu2>
             </ode>
             <torsional>
               <coefficient>1</coefficient>
@@ -314,7 +308,7 @@
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
           <effort>-1</effort>
-          <velocity>-1</velocity>
+          <velocity>12</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -347,7 +341,7 @@
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
           <effort>-1</effort>
-          <velocity>-1</velocity>
+          <velocity>12</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
