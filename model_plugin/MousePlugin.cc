@@ -6,12 +6,9 @@ void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   body = model->GetLink(sdf->Get<std::string>("body"));
-  left_wheel_joint = model->GetJoint(sdf->Get<std::string>("left_wheel_joint"));
-  right_wheel_joint = model->GetJoint(sdf->Get<std::string>("right_wheel_joint"));
 
   node = transport::NodePtr(new transport::Node());
   node->Init();
-  control_sub = node->Subscribe("~/mouse/control", &MousePlugin::ControlCallback, this);
   pose_pub = node->Advertise<msgs::Pose>("~/mouse/pose");
 
   // Connect to the world update event.
@@ -22,12 +19,6 @@ void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 
 void MousePlugin::Update(const common::UpdateInfo &info) {
   PublishInfo();
-  ControlMotors();
-}
-
-void MousePlugin::ControlMotors(){
-  //left_wheel_joint->SetForce(0, left_force);
-  //right_wheel_joint->SetForce(0, right_force);
 }
 
 void MousePlugin::PublishInfo(){
@@ -49,9 +40,4 @@ void MousePlugin::PublishInfo(){
   pose.set_allocated_orientation(rot);
 
   pose_pub->Publish(pose);
-}
-
-void MousePlugin::ControlCallback(ConstVector2dPtr &msg) {
-  left_force = msg->x();
-  right_force = msg->y();
 }

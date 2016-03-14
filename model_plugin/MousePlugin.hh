@@ -17,21 +17,11 @@ class MousePlugin: public ModelPlugin {
 
   private:
 
-    physics::JointPtr left_wheel_joint;
-    physics::JointPtr right_wheel_joint;
-
-    /// \brief Callback for receiving msgs and storing the signal.
-    void ControlCallback(ConstVector2dPtr &msg);
-
     void PublishInfo();
-    void ControlMotors();
 
     physics::ModelPtr model;
     physics::LinkPtr body;
     event::ConnectionPtr updateConn;
     transport::NodePtr node;
-    transport::SubscriberPtr control_sub;
     transport::PublisherPtr pose_pub;
-
-    float left_force, right_force;
 };
