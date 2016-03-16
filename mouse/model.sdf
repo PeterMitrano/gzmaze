@@ -105,7 +105,7 @@
         <ray>
           <scan>
             <horizontal>
-              <samples>5</samples>
+              <samples>7</samples>
               <resolution>1</resolution>
               <min_angle>0</min_angle>
               <max_angle>3.141459265</max_angle>
@@ -308,7 +308,7 @@
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
           <effort>-1</effort>
-          <velocity>12</velocity>
+          <velocity>100</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -342,7 +342,7 @@
           <lower>-1.79769e+308</lower>
           <upper>1.79769e+308</upper>
           <effort>-1</effort>
-          <velocity>12</velocity>
+          <velocity>100</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
