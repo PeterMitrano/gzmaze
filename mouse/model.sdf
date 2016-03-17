@@ -101,19 +101,19 @@
         </surface>
       </collision>
       <sensor name="laser" type="ray">
-        <pose>0 0.03 0.004 0 0 0</pose>
+        <pose>0 0.02 0.004 0 0 0</pose>
         <ray>
           <scan>
             <horizontal>
-              <samples>7</samples>
+              <samples>3</samples>
               <resolution>1</resolution>
-              <min_angle>0</min_angle>
-              <max_angle>3.141459265</max_angle>
+              <min_angle>0.52359877</min_angle>
+              <max_angle>2.61799387</max_angle>
             </horizontal>
           </scan>
           <range>
             <min>0.01</min>
-            <max>1</max>
+            <max>0.15</max>
             <resolution>0.005</resolution>
           </range>
         </ray>
