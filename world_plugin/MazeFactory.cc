@@ -15,9 +15,9 @@ const float MazeFactory::WALL_LENGTH = 0.192;
 const float MazeFactory::WALL_THICKNESS = 0.012;
 const float MazeFactory::BASE_HEIGHT= 0.005;
 const float MazeFactory::PAINT_THICKNESS = 0.01;
+const float MazeFactory::INDICATOR_RADIUS = 0.03;
 
-
-MazeFactory::MazeFactory(): distribution(0,4) {}
+MazeFactory::MazeFactory(): neighbor_dist(0,3) {}
 
 void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 {
@@ -62,7 +62,6 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
 
   if (fs.good()){
     //clear the old walls
-    all_wall_elements.clear();
 
     std::string line;
 
@@ -94,6 +93,13 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
     for (int i=0;i<MAZE_SIZE;i++){
       InsertWall(base_link, i, MAZE_SIZE - 1, Direction::E);
       InsertWall(base_link, 0, i, Direction::N);
+    }
+
+    //add color indicators on each square
+    for (int i=0;i<MAZE_SIZE;i++){
+      for (int j=0;j<MAZE_SIZE;j++){
+        InsertIndicator(base_link, i, j);
+      }
     }
   }
   else {
@@ -128,6 +134,13 @@ void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
     InsertWall(link, 0, i, Direction::N);
     InsertWall(link, MAZE_SIZE-1, i, Direction::S);
   }
+
+  //add color indicators on each square
+  for (int i=0;i<MAZE_SIZE;i++){
+    for (int j=0;j<MAZE_SIZE;j++){
+      InsertIndicator(link, i, j);
+    }
+  }
 }
 
 void MazeFactory::InsertRandomNeighbor(int row, int col)
@@ -139,7 +152,7 @@ void MazeFactory::InsertRandomNeighbor(int row, int col)
   visited[row][col] = true;
 
   //select random neighbor
-  int neighbor = distribution(generator);
+  int neighbor = neighbor_dist(generator);
 
   for (int i=0;i<4;i++){
     switch(neighbor){
@@ -178,14 +191,16 @@ void MazeFactory::InsertRandomNeighbor(int row, int col)
 
 void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
 {
+  //ignore requests to insert center wall
+  if ((row == MAZE_SIZE/2 && col == MAZE_SIZE/2 && (dir == Direction::N || dir == Direction::W))
+      || (row == MAZE_SIZE/2 && col == MAZE_SIZE/2 - 1 && (dir == Direction::N || dir == Direction::E))
+      || (row == MAZE_SIZE/2 - 1 && col == MAZE_SIZE/2 && (dir == Direction::S || dir == Direction::W))
+      || (row == MAZE_SIZE/2 - 1 && col == MAZE_SIZE/2 - 1 && (dir == Direction::S || dir == Direction::E))) {
+    return;
+  }
+
   std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,dir);
   sdf::ElementPtr walls_collision = CreateWallCollision(row,col,dir);
-
-  //add all those to a list so we can remove them for next time.
-  all_wall_elements.insert(all_wall_elements.end(),
-      walls_visuals.begin(),
-      walls_visuals.end());
-  all_wall_elements.push_front(walls_collision);
 
   //insert all the visuals
   std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
@@ -195,6 +210,32 @@ void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction d
   }
 
   link->InsertElement(walls_collision);
+}
+
+void MazeFactory::InsertIndicator(sdf::ElementPtr link, int row, int col)
+{
+  msgs::Pose *pose = CreatePose(row, col, BASE_HEIGHT, Direction::INVALID);
+
+  msgs::Geometry *visual_geo = CreateCylinderGeometry(INDICATOR_RADIUS, 0.001);
+
+  msgs::Visual visual;
+  std::string visual_name = "indicator_" + std::to_string(row)
+                            + "_" + std::to_string(col);
+  visual.set_name(visual_name);
+  visual.set_allocated_geometry(visual_geo);
+  visual.set_allocated_pose(pose);
+
+  msgs::Material_Script *script = new msgs::Material_Script();
+  std::string *uri = script->add_uri();
+  *uri = "file://media/materials/scripts/gazebo.material";
+  script->set_name("Gazebo/Gray");
+
+  msgs::Material *material = new msgs::Material();
+  material->set_allocated_script(script);
+  visual.set_allocated_material(material);
+
+  sdf::ElementPtr visualElem = msgs::VisualToSDF(visual);
+  link->InsertElement(visualElem);
 }
 
 std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direction dir)
@@ -289,6 +330,19 @@ msgs::Pose *MazeFactory::CreatePose(int row, int col, float z, Direction dir) {
   msgs::Pose *pose = new msgs::Pose;
   pose->set_allocated_orientation(orientation);
   pose->set_allocated_position(position);
+}
+
+msgs::Geometry *MazeFactory::CreateCylinderGeometry(float r, float l)
+{
+  msgs::CylinderGeom *cylinder = new msgs::CylinderGeom();
+  cylinder->set_radius(r);
+  cylinder->set_length(l);
+
+  msgs::Geometry *geo = new msgs::Geometry();
+  geo->set_type(msgs::Geometry_Type_CYLINDER);
+  geo->set_allocated_cylinder(cylinder);
+
+  return geo;
 }
 
 msgs::Geometry *MazeFactory::CreateBoxGeometry(float x, float y, float z)

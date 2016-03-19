@@ -48,6 +48,9 @@ namespace gazebo {
       void InsertWall(sdf::ElementPtr link, int row,
           int col, Direction dir);
 
+      /// \brief insert a circular visual model that can be set to different colors!
+      void InsertIndicator(sdf::ElementPtr link, int row, int col);
+
       std::list<sdf::ElementPtr> CreateWallVisual(int row,
           int col, Direction dir);
 
@@ -55,6 +58,7 @@ namespace gazebo {
           int col, Direction dir);
 
       msgs::Geometry *CreateBoxGeometry(float x, float y, float z);
+      msgs::Geometry *CreateCylinderGeometry(float r, float h);
       msgs::Pose *CreatePose(int row, int col, float z, Direction dir);
 
       std::list<sdf::ElementPtr> all_wall_elements;
@@ -70,13 +74,14 @@ namespace gazebo {
       std::string maze_filename;
 
       std::default_random_engine generator;
-      std::uniform_int_distribution<int> distribution;
+      std::uniform_int_distribution<int> neighbor_dist;
 
       constexpr static int MAZE_SIZE = 16;
       const static float WALL_LENGTH,
             WALL_HEIGHT,
             WALL_THICKNESS,
             PAINT_THICKNESS,
+            INDICATOR_RADIUS,
             UNIT,
             BASE_HEIGHT;
 
