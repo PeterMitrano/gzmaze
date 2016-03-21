@@ -19,5 +19,10 @@
     </gui>
 
     <plugin name="maze" filename="libmaze_plugin.so"/>
+
+		<physics type="ode">
+			<!--go as fast as possible!-->
+      <real_time_update_rate>0.0</real_time_update_rate>
+    </physics>
   </world>
 </sdf>
