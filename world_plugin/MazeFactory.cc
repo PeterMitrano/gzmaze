@@ -24,7 +24,7 @@ void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->parent = _parent;
   node = transport::NodePtr(new transport::Node());
   node->Init(parent->GetName());
-  sub = node->Subscribe("~/maze/regenerate", &MazeFactory::Regenerate, this);
+  regen_sub = node->Subscribe("~/maze/regenerate", &MazeFactory::Regenerate, this);
 
   //seed random generator
   generator.seed(time(0));
@@ -94,13 +94,6 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
       InsertWall(base_link, i, MAZE_SIZE - 1, Direction::E);
       InsertWall(base_link, 0, i, Direction::N);
     }
-
-    //add color indicators on each square
-    for (int i=0;i<MAZE_SIZE;i++){
-      for (int j=0;j<MAZE_SIZE;j++){
-        InsertIndicator(base_link, i, j);
-      }
-    }
   }
   else {
     gzmsg << "failed to load file " << maze_filename << std::endl;
@@ -133,13 +126,6 @@ void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
     InsertWall(link, i, MAZE_SIZE-1, Direction::E);
     InsertWall(link, 0, i, Direction::N);
     InsertWall(link, MAZE_SIZE-1, i, Direction::S);
-  }
-
-  //add color indicators on each square
-  for (int i=0;i<MAZE_SIZE;i++){
-    for (int j=0;j<MAZE_SIZE;j++){
-      InsertIndicator(link, i, j);
-    }
   }
 }
 
@@ -210,32 +196,6 @@ void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction d
   }
 
   link->InsertElement(walls_collision);
-}
-
-void MazeFactory::InsertIndicator(sdf::ElementPtr link, int row, int col)
-{
-  msgs::Pose *pose = CreatePose(row, col, BASE_HEIGHT, Direction::INVALID);
-
-  msgs::Geometry *visual_geo = CreateCylinderGeometry(INDICATOR_RADIUS, 0.001);
-
-  msgs::Visual visual;
-  std::string visual_name = "indicator_" + std::to_string(row)
-                            + "_" + std::to_string(col);
-  visual.set_name(visual_name);
-  visual.set_allocated_geometry(visual_geo);
-  visual.set_allocated_pose(pose);
-
-  msgs::Material_Script *script = new msgs::Material_Script();
-  std::string *uri = script->add_uri();
-  *uri = "file://media/materials/scripts/gazebo.material";
-  script->set_name("Gazebo/Gray");
-
-  msgs::Material *material = new msgs::Material();
-  material->set_allocated_script(script);
-  visual.set_allocated_material(material);
-
-  sdf::ElementPtr visualElem = msgs::VisualToSDF(visual);
-  link->InsertElement(visualElem);
 }
 
 std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direction dir)

@@ -30,6 +30,9 @@ namespace gazebo {
 
       void Regenerate(ConstGzStringPtr &msg);
 
+      /// \brief insert a circular visual model that can be set to different colors!
+      void InsertIndicator(ConstGzStringPtr &msg);
+
     private:
 
       char to_char(Direction dir);
@@ -48,9 +51,6 @@ namespace gazebo {
       void InsertWall(sdf::ElementPtr link, int row,
           int col, Direction dir);
 
-      /// \brief insert a circular visual model that can be set to different colors!
-      void InsertIndicator(sdf::ElementPtr link, int row, int col);
-
       std::list<sdf::ElementPtr> CreateWallVisual(int row,
           int col, Direction dir);
 
@@ -64,8 +64,7 @@ namespace gazebo {
       std::list<sdf::ElementPtr> all_wall_elements;
 
       transport::NodePtr node;
-
-      transport::SubscriberPtr sub;
+      transport::SubscriberPtr regen_sub;
 
       physics::WorldPtr parent;
 
