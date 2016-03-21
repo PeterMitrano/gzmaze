@@ -22,6 +22,9 @@ RegenerateWidget::RegenerateWidget()
   QFrame *mainFrame = new QFrame();
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
+  QPushButton *browse_button = new QPushButton(tr("Browse For Maze File"));
+  connect(browse_button, SIGNAL(clicked()), this, SLOT(OnBrowseFile()));
+
   QPushButton *button = new QPushButton(tr("Regenerate From File"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
 
@@ -32,10 +35,11 @@ RegenerateWidget::RegenerateWidget()
   textEdit->setContentsMargins(1, 1, 1, 1);
   textEdit->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
   textEdit->setObjectName("maze_filename");
-  textEdit->setFixedHeight(30);
+  textEdit->setFixedHeight(70);
 
-  frameLayout->addWidget(button);
+  frameLayout->addWidget(browse_button);
   frameLayout->addWidget(textEdit);
+  frameLayout->addWidget(button);
   frameLayout->addWidget(randomButton);
   mainFrame->setLayout(frameLayout);
   mainLayout->addWidget(mainFrame);
@@ -46,7 +50,7 @@ RegenerateWidget::RegenerateWidget()
   this->setLayout(mainLayout);
 
   this->move(10, 10);
-  this->resize(350, 90);
+  this->resize(350, 120);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -56,6 +60,25 @@ RegenerateWidget::RegenerateWidget()
 /////////////////////////////////////////////////
 RegenerateWidget::~RegenerateWidget()
 {
+}
+
+/////////////////////////////////////////////////
+void RegenerateWidget::OnBrowseFile()
+{
+  QFileDialog fileDialog(this, tr("Open Maze"), QDir::homePath(),
+      tr("Maze Files (*.mz)"));
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+
+  if (fileDialog.exec() == QDialog::Accepted) {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    maze_filename = selected[0].toStdString();
+    textEdit->setText(maze_filename.c_str());
+  }
 }
 
 /////////////////////////////////////////////////

@@ -25,6 +25,9 @@ namespace gazebo
       protected slots: void OnRandomButton();
 
       /// \brief Callback trigged when the button is pressed.
+      protected slots: void OnBrowseFile();
+
+      /// \brief Callback trigged when the button is pressed.
       protected slots: void OnButton();
 
       /// \brief Counter used to create unique model names
