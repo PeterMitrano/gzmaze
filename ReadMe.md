@@ -14,7 +14,7 @@ This is where the meat of the code is. We subscribe to ~/maze/regenerate and bui
 
 # Requirements
 cmake 2.8
-Gazebo 6/7 (currently useing 7, but 6 will probably work too)
+Gazebo 6+ (currently using 8)
 
 # Building
 
