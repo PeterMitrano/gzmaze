@@ -21,10 +21,10 @@ namespace gazebo {
    */
   Direction operator++(Direction& dir, int);
 
-  class MazeFactory: public WorldPlugin {
+  class MazePlugin: public WorldPlugin {
 
     public:
-      MazeFactory();
+      MazePlugin();
 
       void Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf);
 

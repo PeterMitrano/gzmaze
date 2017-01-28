@@ -1,4 +1,4 @@
-#include "MazeFactory.hh"
+#include "MazePlugin.hh"
 
 #include <ignition/math/Pose3.hh>
 #include <sstream>
@@ -9,28 +9,28 @@
 namespace gazebo
 {
 
-const float MazeFactory::UNIT = 0.18; //distance between centers of squares
-const float MazeFactory::WALL_HEIGHT = 0.05;
-const float MazeFactory::WALL_LENGTH = 0.192;
-const float MazeFactory::WALL_THICKNESS = 0.012;
-const float MazeFactory::BASE_HEIGHT= 0.005;
-const float MazeFactory::PAINT_THICKNESS = 0.01;
-const float MazeFactory::INDICATOR_RADIUS = 0.03;
+const float MazePlugin::UNIT = 0.18; //distance between centers of squares
+const float MazePlugin::WALL_HEIGHT = 0.05;
+const float MazePlugin::WALL_LENGTH = 0.192;
+const float MazePlugin::WALL_THICKNESS = 0.012;
+const float MazePlugin::BASE_HEIGHT= 0.005;
+const float MazePlugin::PAINT_THICKNESS = 0.01;
+const float MazePlugin::INDICATOR_RADIUS = 0.03;
 
-MazeFactory::MazeFactory(): neighbor_dist(0,3) {}
+MazePlugin::MazePlugin(): neighbor_dist(0,3) {}
 
-void MazeFactory::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
+void MazePlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 {
   this->parent = _parent;
   node = transport::NodePtr(new transport::Node());
   node->Init(parent->GetName());
-  regen_sub = node->Subscribe("~/maze/regenerate", &MazeFactory::Regenerate, this);
+  regen_sub = node->Subscribe("~/maze/regenerate", &MazePlugin::Regenerate, this);
 
   //seed random generator
   generator.seed(time(0));
 }
 
-void MazeFactory::Regenerate(ConstGzStringPtr &msg)
+void MazePlugin::Regenerate(ConstGzStringPtr &msg)
 {
   maze_filename = msg->data();
 
@@ -55,7 +55,7 @@ void MazeFactory::Regenerate(ConstGzStringPtr &msg)
   parent->InsertModelSDF(*modelSDF);
 }
 
-void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
+void MazePlugin::InsertWallsFromFile(sdf::ElementPtr base_link)
 {
   std::fstream fs;
   fs.open(maze_filename, std::fstream::in);
@@ -100,7 +100,7 @@ void MazeFactory::InsertWallsFromFile(sdf::ElementPtr base_link)
   }
 }
 
-void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
+void MazePlugin::InsertRandomWalls(sdf::ElementPtr link)
 {
   //reset
   for (int i=0;i<MAZE_SIZE;i++){
@@ -129,7 +129,7 @@ void MazeFactory::InsertRandomWalls(sdf::ElementPtr link)
   }
 }
 
-void MazeFactory::InsertRandomNeighbor(int row, int col)
+void MazePlugin::InsertRandomNeighbor(int row, int col)
 {
   //make sure it's in bounds
   if (row >= MAZE_SIZE || row < 0 || col >= MAZE_SIZE || col < 0) return;
@@ -175,7 +175,7 @@ void MazeFactory::InsertRandomNeighbor(int row, int col)
   }
 }
 
-void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
+void MazePlugin::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
 {
   //ignore requests to insert center wall
   if ((row == MAZE_SIZE/2 && col == MAZE_SIZE/2 && (dir == Direction::N || dir == Direction::W))
@@ -198,7 +198,7 @@ void MazeFactory::InsertWall(sdf::ElementPtr link, int row, int col, Direction d
   link->InsertElement(walls_collision);
 }
 
-std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direction dir)
+std::list<sdf::ElementPtr> MazePlugin::CreateWallVisual(int row, int col, Direction dir)
 {
   msgs::Pose *visual_pose = CreatePose(row, col, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2, dir);
   msgs::Pose *paint_visual_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2, dir);
@@ -237,7 +237,7 @@ std::list<sdf::ElementPtr> MazeFactory::CreateWallVisual(int row, int col, Direc
   return visuals;
 }
 
-sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir)
+sdf::ElementPtr MazePlugin::CreateWallCollision(int row, int col, Direction dir)
 {
   msgs::Pose *collision_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT/2, dir);
 
@@ -253,7 +253,7 @@ sdf::ElementPtr MazeFactory::CreateWallCollision(int row, int col, Direction dir
   return collisionElem;
 }
 
-msgs::Pose *MazeFactory::CreatePose(int row, int col, float z, Direction dir) {
+msgs::Pose *MazePlugin::CreatePose(int row, int col, float z, Direction dir) {
   float x_offset=0, y_offset=0;
   float z_rot = 0;
 
@@ -292,7 +292,7 @@ msgs::Pose *MazeFactory::CreatePose(int row, int col, float z, Direction dir) {
   pose->set_allocated_position(position);
 }
 
-msgs::Geometry *MazeFactory::CreateCylinderGeometry(float r, float l)
+msgs::Geometry *MazePlugin::CreateCylinderGeometry(float r, float l)
 {
   msgs::CylinderGeom *cylinder = new msgs::CylinderGeom();
   cylinder->set_radius(r);
@@ -305,7 +305,7 @@ msgs::Geometry *MazeFactory::CreateCylinderGeometry(float r, float l)
   return geo;
 }
 
-msgs::Geometry *MazeFactory::CreateBoxGeometry(float x, float y, float z)
+msgs::Geometry *MazePlugin::CreateBoxGeometry(float x, float y, float z)
 {
   msgs::Vector3d *size = new msgs::Vector3d();
   size->set_x(x);
@@ -322,7 +322,7 @@ msgs::Geometry *MazeFactory::CreateBoxGeometry(float x, float y, float z)
   return geo;
 }
 
-sdf::ElementPtr MazeFactory::LoadModel()
+sdf::ElementPtr MazePlugin::LoadModel()
 {
   modelSDF.reset(new sdf::SDF);
 
@@ -352,7 +352,7 @@ Direction operator++(Direction& dir, int) {
   return dir;
 }
 
-char MazeFactory::to_char(Direction dir)
+char MazePlugin::to_char(Direction dir)
 {
   switch(dir)
   {
@@ -369,5 +369,5 @@ char MazeFactory::to_char(Direction dir)
   }
 }
 
-GZ_REGISTER_WORLD_PLUGIN(MazeFactory)
+GZ_REGISTER_WORLD_PLUGIN(MazePlugin)
 }
