@@ -18,14 +18,6 @@ Gazebo 6+ (currently using 8)
 
 # Building
 
-    #from root directory
-    cd gui_plugin
-    mkdir build
-    cd build
-    cmake .. && make
-
-    #from root directory
-    cd world_plugin
     mkdir build
     cd build
     cmake .. && make
