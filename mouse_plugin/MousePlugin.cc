@@ -22,22 +22,17 @@ void MousePlugin::Update(const common::UpdateInfo &info) {
 }
 
 void MousePlugin::PublishInfo(){
-  math::Pose realtivePose = body->GetWorldPose();
+  auto const relativePose = body->WorldPose();
 
-  msgs::Vector3d *pos = new msgs::Vector3d();
-  pos->set_x(realtivePose.pos[0]);
-  pos->set_y(realtivePose.pos[1]);
-  pos->set_z(realtivePose.pos[2]);
-
-  msgs::Quaternion *rot = new msgs::Quaternion();
-  rot->set_x(realtivePose.rot.x);
-  rot->set_y(realtivePose.rot.y);
-  rot->set_z(realtivePose.rot.z);
-  rot->set_w(realtivePose.rot.w);
 
   msgs::Pose pose;
-  pose.set_allocated_position(pos);
-  pose.set_allocated_orientation(rot);
+  pose.mutable_position()->set_x(relativePose.Pos().X());
+  pose.mutable_position()->set_y(relativePose.Pos().Y());
+  pose.mutable_position()->set_z(relativePose.Pos().Z());
+  pose.mutable_orientation()->set_x(relativePose.Rot().X());
+  pose.mutable_orientation()->set_y(relativePose.Rot().Y());
+  pose.mutable_orientation()->set_z(relativePose.Rot().Z());
+  pose.mutable_orientation()->set_w(relativePose.Rot().W());
 
   pose_pub->Publish(pose);
 }
