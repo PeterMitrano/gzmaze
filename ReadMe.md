@@ -14,7 +14,11 @@ This is where the meat of the code is. We subscribe to ~/maze/regenerate and bui
 
 # Requirements
 cmake 2.8
-Gazebo 6+ (currently using 8)
+Gazebo 9
+
+To get the dependencies, you can probably just run
+
+    sudo apt install gazebo9 libgazebo9-dev
 
 # Building
 
@@ -30,7 +34,8 @@ Be sure to add the following to your `.gazebo/gui.ini` file
     filenames=libregenerate_widget.so
 ```
 
-   ./setup.sh #this will setup the environment variables you need and run gazebo
+
+    ./setup.sh #this will setup the environment variables you need and run gazebo
 
 # The input files
 look at sample_maze.mz for an example
