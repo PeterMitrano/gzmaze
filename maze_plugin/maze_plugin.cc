@@ -1,4 +1,4 @@
-#include "MazePlugin.h"
+#include "maze_plugin.h"
 
 #include <ignition/math/Pose3.hh>
 #include <sstream>
@@ -13,11 +13,11 @@ const float MazePlugin::UNIT = 0.18; //distance between centers of squares
 const float MazePlugin::WALL_HEIGHT = 0.05;
 const float MazePlugin::WALL_LENGTH = 0.192;
 const float MazePlugin::WALL_THICKNESS = 0.012;
-const float MazePlugin::BASE_HEIGHT= 0.005;
+const float MazePlugin::BASE_HEIGHT = 0.005;
 const float MazePlugin::PAINT_THICKNESS = 0.01;
-const float MazePlugin::INDICATOR_RADIUS = 0.03;
 
-MazePlugin::MazePlugin(): neighbor_dist(0,3) {}
+MazePlugin::MazePlugin() : neighbor_dist(0, 3)
+{}
 
 void MazePlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 {
@@ -41,8 +41,7 @@ void MazePlugin::Regenerate(ConstGzStringPtr &msg)
   {
     //create random maze here
     InsertRandomWalls(base_link);
-  }
-  else
+  } else
   {
     //load maze from file
     gzmsg << "loading from file " << maze_filename << std::endl;
@@ -59,42 +58,49 @@ void MazePlugin::InsertWallsFromFile(sdf::ElementPtr base_link)
   std::fstream fs;
   fs.open(maze_filename, std::fstream::in);
 
-  if (fs.good()){
+  if (fs.good())
+  {
     //clear the old walls
 
     std::string line;
 
     //look West and North to connect any nodes
-    for (int i=0;i<MAZE_SIZE;i++){ //read in each line
+    for (int i = 0; i < MAZE_SIZE; i++)
+    { //read in each line
       std::getline(fs, line);
 
-      if (!fs) {
-        gzmsg  << "getline failed" << std::endl;
+      if (!fs)
+      {
+        gzmsg << "getline failed" << std::endl;
         return;
       }
 
       int charPos = 0;
-      for (int j=0;j<MAZE_SIZE;j++){
-        if (line.at(charPos) == '|'){
+      for (int j = 0; j < MAZE_SIZE; j++)
+      {
+        if (line.at(charPos) == '|')
+        {
           //add a wall on the west
-          InsertWall(base_link, i,j,Direction::W);
+          InsertWall(base_link, i, j, Direction::W);
         }
         charPos++;
-        if (line.at(charPos) == '_'){
+        if (line.at(charPos) == '_')
+        {
           //add a wall on the south
-          InsertWall(base_link, i,j,Direction::S);
+          InsertWall(base_link, i, j, Direction::S);
         }
         charPos++;
       }
     }
 
     //add east and north walls
-    for (int i=0;i<MAZE_SIZE;i++){
+    for (int i = 0; i < MAZE_SIZE; i++)
+    {
       InsertWall(base_link, i, MAZE_SIZE - 1, Direction::E);
       InsertWall(base_link, 0, i, Direction::N);
     }
-  }
-  else {
+  } else
+  {
     gzmsg << "failed to load file " << maze_filename << std::endl;
   }
 }
@@ -102,29 +108,36 @@ void MazePlugin::InsertWallsFromFile(sdf::ElementPtr base_link)
 void MazePlugin::InsertRandomWalls(sdf::ElementPtr link)
 {
   //reset
-  for (int i=0;i<MAZE_SIZE;i++){
-    for (int j=0;j<MAZE_SIZE;j++){
+  for (int i = 0; i < MAZE_SIZE; i++)
+  {
+    for (int j = 0; j < MAZE_SIZE; j++)
+    {
       visited[i][j] = false;
-      for (int k=0;k<4;k++){
+      for (int k = 0; k < 4; k++)
+      {
         connected[i][j][k] = false;
       }
     }
   }
 
   //start with maze "end" in the center
-  InsertRandomNeighbor(MAZE_SIZE/2,MAZE_SIZE/2);
+  InsertRandomNeighbor(MAZE_SIZE / 2, MAZE_SIZE / 2);
 
-  for (int i=0;i<MAZE_SIZE;i++){
-    for (int j=0;j<MAZE_SIZE;j++){
-      if (!connected[i][j][3]) { InsertWall(link, i, j, Direction::W);}
-      if (!connected[i][j][2]) { InsertWall(link, i, j, Direction::S);}
+  for (int i = 0; i < MAZE_SIZE; i++)
+  {
+    for (int j = 0; j < MAZE_SIZE; j++)
+    {
+      if (!connected[i][j][3])
+      { InsertWall(link, i, j, Direction::W); }
+      if (!connected[i][j][2])
+      { InsertWall(link, i, j, Direction::S); }
     }
 
     //add outer walls
     InsertWall(link, i, 0, Direction::W);
-    InsertWall(link, i, MAZE_SIZE-1, Direction::E);
+    InsertWall(link, i, MAZE_SIZE - 1, Direction::E);
     InsertWall(link, 0, i, Direction::N);
-    InsertWall(link, MAZE_SIZE-1, i, Direction::S);
+    InsertWall(link, MAZE_SIZE - 1, i, Direction::S);
   }
 }
 
@@ -139,53 +152,60 @@ void MazePlugin::InsertRandomNeighbor(int row, int col)
   //select random neighbor
   int neighbor = neighbor_dist(generator);
 
-  for (int i=0;i<4;i++){
-    switch(neighbor){
+  for (int i = 0; i < 4; i++)
+  {
+    switch (neighbor)
+    {
       case 0:
-        if (row >= 0 && !visited[row-1][col]) {
+        if (row >= 0 && !visited[row - 1][col])
+        {
           connected[row][col][neighbor] = true;
-          connected[row-1][col][2] = true;
-          InsertRandomNeighbor(row-1, col);
+          connected[row - 1][col][2] = true;
+          InsertRandomNeighbor(row - 1, col);
         }
         break;
       case 1:
-        if (col < MAZE_SIZE && !visited[row][col+1]) {
+        if (col < MAZE_SIZE && !visited[row][col + 1])
+        {
           connected[row][col][neighbor] = true;
-          connected[row][col+1][3] = true;
-          InsertRandomNeighbor(row, col+1);
+          connected[row][col + 1][3] = true;
+          InsertRandomNeighbor(row, col + 1);
         }
         break;
       case 2:
-        if (row < MAZE_SIZE && !visited[row+1][col]) {
+        if (row < MAZE_SIZE && !visited[row + 1][col])
+        {
           connected[row][col][neighbor] = true;
-          connected[row+1][col][0] = true;
-          InsertRandomNeighbor(row+1, col);
+          connected[row + 1][col][0] = true;
+          InsertRandomNeighbor(row + 1, col);
         }
         break;
       case 3:
-        if (col >= 0 && !visited[row][col-1]) {
+        if (col >= 0 && !visited[row][col - 1])
+        {
           connected[row][col][neighbor] = true;
-          connected[row][col-1][1] = true;
-          InsertRandomNeighbor(row, col-1);
+          connected[row][col - 1][1] = true;
+          InsertRandomNeighbor(row, col - 1);
         }
         break;
     }
-    neighbor = (neighbor+1)%4;
+    neighbor = (neighbor + 1) % 4;
   }
 }
 
 void MazePlugin::InsertWall(sdf::ElementPtr link, int row, int col, Direction dir)
 {
   //ignore requests to insert center wall
-  if ((row == MAZE_SIZE/2 && col == MAZE_SIZE/2 && (dir == Direction::N || dir == Direction::W))
-      || (row == MAZE_SIZE/2 && col == MAZE_SIZE/2 - 1 && (dir == Direction::N || dir == Direction::E))
-      || (row == MAZE_SIZE/2 - 1 && col == MAZE_SIZE/2 && (dir == Direction::S || dir == Direction::W))
-      || (row == MAZE_SIZE/2 - 1 && col == MAZE_SIZE/2 - 1 && (dir == Direction::S || dir == Direction::E))) {
+  if ((row == MAZE_SIZE / 2 && col == MAZE_SIZE / 2 && (dir == Direction::N || dir == Direction::W))
+      || (row == MAZE_SIZE / 2 && col == MAZE_SIZE / 2 - 1 && (dir == Direction::N || dir == Direction::E))
+      || (row == MAZE_SIZE / 2 - 1 && col == MAZE_SIZE / 2 && (dir == Direction::S || dir == Direction::W))
+      || (row == MAZE_SIZE / 2 - 1 && col == MAZE_SIZE / 2 - 1 && (dir == Direction::S || dir == Direction::E)))
+  {
     return;
   }
 
-  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row,col,dir);
-  sdf::ElementPtr walls_collision = CreateWallCollision(row,col,dir);
+  std::list<sdf::ElementPtr> walls_visuals = CreateWallVisual(row, col, dir);
+  sdf::ElementPtr walls_collision = CreateWallCollision(row, col, dir);
 
   //insert all the visuals
   std::list<sdf::ElementPtr>::iterator list_iter = walls_visuals.begin();
@@ -199,8 +219,8 @@ void MazePlugin::InsertWall(sdf::ElementPtr link, int row, int col, Direction di
 
 std::list<sdf::ElementPtr> MazePlugin::CreateWallVisual(int row, int col, Direction dir)
 {
-  msgs::Pose *visual_pose = CreatePose(row, col, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS)/2, dir);
-  msgs::Pose *paint_visual_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS/2, dir);
+  msgs::Pose *visual_pose = CreatePose(row, col, BASE_HEIGHT + (WALL_HEIGHT - PAINT_THICKNESS) / 2, dir);
+  msgs::Pose *paint_visual_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT - PAINT_THICKNESS / 2, dir);
 
   msgs::Geometry *visual_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, WALL_HEIGHT - PAINT_THICKNESS);
   msgs::Geometry *paint_visual_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, PAINT_THICKNESS);
@@ -238,7 +258,7 @@ std::list<sdf::ElementPtr> MazePlugin::CreateWallVisual(int row, int col, Direct
 
 sdf::ElementPtr MazePlugin::CreateWallCollision(int row, int col, Direction dir)
 {
-  msgs::Pose *collision_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT/2, dir);
+  msgs::Pose *collision_pose = CreatePose(row, col, BASE_HEIGHT + WALL_HEIGHT / 2, dir);
 
   msgs::Geometry *collision_geo = CreateBoxGeometry(WALL_LENGTH, WALL_THICKNESS, WALL_HEIGHT);
 
@@ -252,28 +272,30 @@ sdf::ElementPtr MazePlugin::CreateWallCollision(int row, int col, Direction dir)
   return collisionElem;
 }
 
-msgs::Pose *MazePlugin::CreatePose(int row, int col, float z, Direction dir) {
-  float x_offset=0, y_offset=0;
+msgs::Pose *MazePlugin::CreatePose(int row, int col, float z, Direction dir)
+{
+  float x_offset = 0, y_offset = 0;
   float z_rot = 0;
 
-  switch(dir){
+  switch (dir)
+  {
     case Direction::N:
-      y_offset = UNIT/2;
+      y_offset = UNIT / 2;
       break;
     case Direction::E:
-     x_offset = UNIT/2;
-      z_rot = M_PI/2;
-     break;
+      x_offset = UNIT / 2;
+      z_rot = M_PI / 2;
+      break;
     case Direction::S:
-     y_offset = -UNIT/2;
-     break;
+      y_offset = -UNIT / 2;
+      break;
     case Direction::W:
-     x_offset = -UNIT/2;
-     z_rot = M_PI/2;
-     break;
+      x_offset = -UNIT / 2;
+      z_rot = M_PI / 2;
+      break;
   }
 
-  float zero_offset = (UNIT * (MAZE_SIZE - 1)/2);
+  float zero_offset = (UNIT * (MAZE_SIZE - 1) / 2);
   float x = -zero_offset + x_offset + col * UNIT;
   float y = zero_offset + y_offset - row * UNIT;
 
@@ -283,8 +305,8 @@ msgs::Pose *MazePlugin::CreatePose(int row, int col, float z, Direction dir) {
   position->set_z(z);
 
   auto *orientation = new msgs::Quaternion();
-  orientation->set_z(sin(z_rot/2));
-  orientation->set_w(cos(z_rot/2));
+  orientation->set_z(sin(z_rot / 2));
+  orientation->set_w(cos(z_rot / 2));
 
   auto *pose = new msgs::Pose;
   pose->set_allocated_orientation(orientation);
@@ -333,8 +355,10 @@ sdf::ElementPtr MazePlugin::LoadModel()
   return modelSDF->Root()->GetElement("model");
 }
 
-Direction operator++(Direction& dir, int) {
-  switch(dir){
+Direction operator++(Direction &dir, int)
+{
+  switch (dir)
+  {
     case Direction::N:
       dir = Direction::E;
       break;
@@ -355,18 +379,18 @@ Direction operator++(Direction& dir, int) {
 
 char MazePlugin::to_char(Direction dir)
 {
-  switch(dir)
+  switch (dir)
   {
-  case Direction::N:
-    return 'N';
-  case Direction::E:
-    return 'E';
-  case Direction::S:
-    return 'S';
-  case Direction::W:
-    return 'W';
-  default:
-    return '\0';
+    case Direction::N:
+      return 'N';
+    case Direction::E:
+      return 'E';
+    case Direction::S:
+      return 'S';
+    case Direction::W:
+      return 'W';
+    default:
+      return '\0';
   }
 }
 

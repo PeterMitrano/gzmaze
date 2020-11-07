@@ -5,6 +5,8 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
 
+#include "ui_regenerate_widget.h"
+
 namespace gazebo
 {
 class GAZEBO_VISIBLE RegenerateWidget : public GUIPlugin
@@ -24,9 +26,10 @@ class GAZEBO_VISIBLE RegenerateWidget : public GUIPlugin
  private:
   transport::NodePtr node;
 
-  transport::PublisherPtr regenPub;
+  transport::PublisherPtr regenerate_pub_;
 
-  QTextEdit *textEdit;
-  std::string maze_filename;
+  std::string maze_filename_;
+
+  Ui_RegenerateWidget ui_;
 };
 }

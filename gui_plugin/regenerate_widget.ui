@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RegenerateWidget</class>
+ <widget class="QWidget" name="RegenerateWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>136</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QPushButton" name="browse_button">
+     <property name="text">
+      <string>Browse for maze file</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="filename_edit">
+     <property name="text">
+      <string>~/Projects/smartmouse/gzmaze/simple.mz</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="from_file_button">
+     <property name="text">
+      <string>Regenerate from File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="random_button">
+     <property name="text">
+      <string>Regenerate randomly</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

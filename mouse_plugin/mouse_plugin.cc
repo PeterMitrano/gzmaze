@@ -1,8 +1,9 @@
-#include "MousePlugin.h"
+#include "mouse_plugin.h"
 
 GZ_REGISTER_MODEL_PLUGIN(MousePlugin)
 
-void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf)
+{
   this->model = model;
 
   body = model->GetLink(sdf->Get<std::string>("body"));
@@ -13,17 +14,17 @@ void MousePlugin::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&MousePlugin::Update, this, _1));
+  updateConn = event::Events::ConnectWorldUpdateBegin([this](auto &&info) { Update(info); });
 }
 
-void MousePlugin::Update(const common::UpdateInfo &info) {
+void MousePlugin::Update(const common::UpdateInfo &info)
+{
   PublishInfo();
 }
 
-void MousePlugin::PublishInfo(){
+void MousePlugin::PublishInfo()
+{
   auto const relativePose = body->WorldPose();
-
 
   msgs::Pose pose;
   pose.mutable_position()->set_x(relativePose.Pos().X());
