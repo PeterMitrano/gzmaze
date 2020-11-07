@@ -1,4 +1,4 @@
-#include "MousePlugin.hh"
+#include "MousePlugin.h"
 
 GZ_REGISTER_MODEL_PLUGIN(MousePlugin)
 

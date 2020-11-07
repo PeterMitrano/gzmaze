@@ -1,4 +1,4 @@
-#include "MazePlugin.hh"
+#include "MazePlugin.h"
 
 #include <ignition/math/Pose3.hh>
 #include <sstream>
@@ -277,18 +277,20 @@ msgs::Pose *MazePlugin::CreatePose(int row, int col, float z, Direction dir) {
   float x = -zero_offset + x_offset + col * UNIT;
   float y = zero_offset + y_offset - row * UNIT;
 
-  msgs::Vector3d *position = new msgs::Vector3d();
+  auto *position = new msgs::Vector3d();
   position->set_x(x);
   position->set_y(y);
   position->set_z(z);
 
-  msgs::Quaternion *orientation = new msgs::Quaternion();
+  auto *orientation = new msgs::Quaternion();
   orientation->set_z(sin(z_rot/2));
   orientation->set_w(cos(z_rot/2));
 
-  msgs::Pose *pose = new msgs::Pose;
+  auto *pose = new msgs::Pose;
   pose->set_allocated_orientation(orientation);
   pose->set_allocated_position(position);
+
+  return pose;
 }
 
 msgs::Geometry *MazePlugin::CreateCylinderGeometry(float r, float l)

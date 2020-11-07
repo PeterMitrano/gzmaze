@@ -1,7 +1,7 @@
 #include <sstream>
 #include <boost/algorithm/string/replace.hpp>
 #include <gazebo/msgs/msgs.hh>
-#include "RegenerateWidget.hh"
+#include "RegenerateWidget.h"
 
 using namespace gazebo;
 
@@ -12,8 +12,6 @@ GZ_REGISTER_GUI_PLUGIN(RegenerateWidget)
 RegenerateWidget::RegenerateWidget()
   : GUIPlugin()
 {
-  this->counter = 0;
-
   // Set the frame background and foreground colors
   this->setStyleSheet(
     "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
@@ -56,11 +54,6 @@ RegenerateWidget::RegenerateWidget()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->regenPub = this->node->Advertise<msgs::GzString>("~/maze/regenerate");
-}
-
-/////////////////////////////////////////////////
-RegenerateWidget::~RegenerateWidget()
-{
 }
 
 /////////////////////////////////////////////////
